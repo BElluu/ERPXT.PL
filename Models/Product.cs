@@ -24,7 +24,7 @@ namespace ERPXTpl.Models
 
         public ProductTypeEnum ProductType { get; set; }
 
-        public bool ShouldSerializeId()
+        internal bool ShouldSerializeId()
         {
             return Id != 0;
         }
