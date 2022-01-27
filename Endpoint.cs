@@ -10,5 +10,6 @@ namespace ERPXTpl
         public static string PRODUCTS = "https://app.erpxt.pl/api2/public/products/";
         public static string CUSTOMERS = "https://app.erpxt.pl/api2/public/v1.2/customers/";
         public static string AUTHORIZATION = "https://app.erpxt.pl/api2/public/token";
+        public static string PAYMENT_METHODS = "https://app.erpxt.pl/api2/public/paymenttypes/";
     }
 }

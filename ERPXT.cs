@@ -250,6 +250,57 @@ namespace ERPXTpl
             return response.StatusCode.ToString();
         }
 
+        public async Task<List<PaymentMethod>> GetPaymentMethod()
+        {
+            await GetTokenIfNeeded();
+
+            List<PaymentMethod> paymentMethodData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PAYMENT_METHODS);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    paymentMethodData = JsonConvert.DeserializeObject<List<PaymentMethod>>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return paymentMethodData;
+        }
+
+        public async Task<PaymentMethod> GetPaymentMethod(int paymentMethodId)
+        {
+            PaymentMethodValidator.GetPaymentMethodById(paymentMethodId);
+            await GetTokenIfNeeded();
+
+            PaymentMethod paymentMethodData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PAYMENT_METHODS + paymentMethodId);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    paymentMethodData = JsonConvert.DeserializeObject<PaymentMethod>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return paymentMethodData;
+        }
+
         public async Task<List<BankAccount>> GetBankAccount()
         {
             await GetTokenIfNeeded();
