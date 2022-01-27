@@ -277,6 +277,7 @@ namespace ERPXTpl
 
         public async Task<BankAccount> GetBankAccount(int bankAccountId)
         {
+            BankAccountValidator.GetBankAccountById(bankAccountId);
             await GetTokenIfNeeded();
 
             BankAccount bankAccountData = null;
