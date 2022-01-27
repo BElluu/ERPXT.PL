@@ -35,7 +35,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "https://app.erpxt.pl/api2/public/products/" + productId);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PRODUCTS + productId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
@@ -60,7 +60,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://app.erpxt.pl/api2/public/products");
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Endpoint.PRODUCTS);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -92,7 +92,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "https://app.erpxt.pl/api2/public/products");
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.PRODUCTS);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -126,7 +126,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, "https://app.erpxt.pl/api2/public/products/" + productId);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.PRODUCTS + productId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     response = await client.SendAsync(request);
@@ -148,15 +148,13 @@ namespace ERPXTpl
         public async Task<Customer> GetCustomerById(long customerId)
         {
             CustomerValidator.DeleteAndGetCustomerByIdValidator(customerId);
-            string url = "https://app.erpxt.pl/api2/public/v1.2/customers/";
-            return await GetCustomer(customerId, url);
+            return await GetCustomer(customerId, Endpoint.CUSTOMERS);
         }
 
         public async Task<Customer> GetCustomerByTIN(long TIN)
         {
             CustomerValidator.GetCustomerByTINValidator(TIN);
-            string url = "https://app.erpxt.pl/api2/public/v1.2/customers/?nip=";
-            return await GetCustomer(TIN, url);
+            return await GetCustomer(TIN, Endpoint.CUSTOMERS + "?nip=");
         }
 
         public async Task<int> AddCustomer(Customer customer)
@@ -168,7 +166,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://app.erpxt.pl/api2/public/v1.2/customers");
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Endpoint.CUSTOMERS);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -199,7 +197,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "https://app.erpxt.pl/api2/public/v1.2/customers");
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.CUSTOMERS);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -233,7 +231,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, "https://app.erpxt.pl/api2/public/v1.2/customers/" + customerId);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.CUSTOMERS + customerId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     response = await client.SendAsync(request);
@@ -250,6 +248,57 @@ namespace ERPXTpl
                 }
             }
             return response.StatusCode.ToString();
+        }
+
+        public async Task<List<BankAccount>> GetBankAccount()
+        {
+            await GetTokenIfNeeded();
+
+            List<BankAccount> bankAccountData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.BANK_ACCOUNTS);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    bankAccountData = JsonConvert.DeserializeObject<List<BankAccount>>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return bankAccountData;
+        }
+
+        public async Task<BankAccount> GetBankAccount(int bankAccountId)
+        {
+            BankAccountValidator.GetBankAccountById(bankAccountId);
+            await GetTokenIfNeeded();
+
+            BankAccount bankAccountData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.BANK_ACCOUNTS + bankAccountId);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    bankAccountData = JsonConvert.DeserializeObject<BankAccount>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return bankAccountData;
         }
 
         private async Task<Customer> GetCustomer(long value, string url)
@@ -287,7 +336,7 @@ namespace ERPXTpl
                 {
                     try
                     {
-                        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://app.erpxt.pl/api2/public/token");
+                        HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Endpoint.AUTHORIZATION);
 
                         var authData = new UTF8Encoding().GetBytes(clientId + ":" + secretKey);
                         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/x-www-form-urlencoded"));
