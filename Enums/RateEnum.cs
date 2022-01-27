@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ERPXTpl.Enums
+﻿namespace ERPXTpl.Enums
 {
     public enum RateEnum
     {

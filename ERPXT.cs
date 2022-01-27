@@ -28,11 +28,7 @@ namespace ERPXTpl
         public async Task<Product> GetProduct(int productId)
         {
             ProductValidator.DeleteAndGetProductValidator(productId);
-
-            if (DateTime.Now >= GetExpireDate())
-            {
-                await GetAuthToken(ClientID, SecretKey);
-            }
+            await GetTokenIfNeeded();
 
             Product productData = null;
             using (var client = new HttpClient())
@@ -58,11 +54,7 @@ namespace ERPXTpl
         public async Task<int> AddProduct(Product product)
         {
             ProductValidator.AddProductValidator(product);
-
-            if (DateTime.Now >= GetExpireDate())
-            {
-                await GetAuthToken(ClientID, SecretKey);
-            }
+            await GetTokenIfNeeded();
 
             using (var client = new HttpClient())
             {
@@ -75,7 +67,7 @@ namespace ERPXTpl
 
                     string productData = JsonConvert.SerializeObject(product, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     StringContent stringContent = new StringContent(productData, Encoding.UTF8, "application/json");
-                    
+
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
@@ -93,11 +85,8 @@ namespace ERPXTpl
         public async Task<string> ModifyProduct(Product product)
         {
             ProductValidator.ModifyProductValidator(product);
+            await GetTokenIfNeeded();
 
-            if (DateTime.Now >= GetExpireDate())
-            {
-                await GetAuthToken(ClientID, SecretKey);
-            }
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
             {
@@ -123,7 +112,6 @@ namespace ERPXTpl
                 {
                     Console.WriteLine(ex.Message);
                 }
-
             }
             return response.StatusCode.ToString();
         }
@@ -131,11 +119,7 @@ namespace ERPXTpl
         public async Task<string> DeleteProduct(int productId)
         {
             ProductValidator.DeleteAndGetProductValidator(productId);
-
-            if (DateTime.Now >= GetExpireDate())
-            {
-                await GetAuthToken(ClientID, SecretKey);
-            }
+            await GetTokenIfNeeded();
 
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
@@ -161,6 +145,137 @@ namespace ERPXTpl
             return response.StatusCode.ToString();
         }
 
+        public async Task<Customer> GetCustomerById(long customerId)
+        {
+            CustomerValidator.DeleteAndGetCustomerByIdValidator(customerId);
+            string url = "https://app.erpxt.pl/api2/public/v1.2/customers/";
+            return await GetCustomer(customerId, url);
+        }
+
+        public async Task<Customer> GetCustomerByTIN(long TIN)
+        {
+            CustomerValidator.GetCustomerByTINValidator(TIN);
+            string url = "https://app.erpxt.pl/api2/public/v1.2/customers/?nip=";
+            return await GetCustomer(TIN, url);
+        }
+
+        public async Task<int> AddCustomer(Customer customer)
+        {
+            CustomerValidator.PostCustomerValidator(customer);
+            await GetTokenIfNeeded();
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "https://app.erpxt.pl/api2/public/v1.2/customers");
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    string customerData = JsonConvert.SerializeObject(customer, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(customerData, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    return Int32.Parse(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return 0;
+        }
+
+        public async Task<string> ModifyCustomer(Customer customer)
+        {
+            CustomerValidator.ModifyCustomerValidator(customer);
+            await GetTokenIfNeeded();
+
+            HttpResponseMessage response = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, "https://app.erpxt.pl/api2/public/v1.2/customers");
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    string customerData = JsonConvert.SerializeObject(customer, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(customerData, Encoding.UTF8, "application/json");
+
+                    response = await client.PutAsync(request.RequestUri, stringContent);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        return response.StatusCode.ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return response.StatusCode.ToString();
+        }
+
+        public async Task<string> DeleteCustomer(int customerId)
+        {
+            ProductValidator.DeleteAndGetProductValidator(customerId);
+            await GetTokenIfNeeded();
+
+            HttpResponseMessage response = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, "https://app.erpxt.pl/api2/public/v1.2/customers/" + customerId);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
+                    {
+                        return response.StatusCode.ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return response.StatusCode.ToString();
+        }
+
+        private async Task<Customer> GetCustomer(long value, string url)
+        {
+            await GetTokenIfNeeded();
+
+            Customer customerData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url + value);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return customerData;
+        }
 
         private async Task GetAuthToken(string clientId, string secretKey)
         {
@@ -193,8 +308,6 @@ namespace ERPXTpl
                             cacheExpire = DateTime.Now.AddSeconds(secondsBeforeExpire);
                             cache.Set(CacheData.Expires, cacheExpire.ToString());
                             cache.Set(CacheData.AccessToken, authObject.access_token);
-
-                            Console.WriteLine(cache.Get(CacheData.AccessToken));
                         }
                         catch (Exception ex)
                         {
@@ -209,6 +322,14 @@ namespace ERPXTpl
                 }
             }
 
+        }
+
+        private async Task GetTokenIfNeeded()
+        {
+            if (DateTime.Now >= GetExpireDate())
+            {
+                await GetAuthToken(ClientID, SecretKey);
+            }
         }
 
         private DateTime GetExpireDate()
