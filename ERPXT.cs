@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -350,6 +351,100 @@ namespace ERPXTpl
                 }
             }
             return bankAccountData;
+        }
+
+        public async Task<List<PrintTemplate>> GetPrintTemplates()
+        {
+            await GetTokenIfNeeded();
+
+            List<PrintTemplate> printsData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PRINT_TEMPLATES);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    printsData = JsonConvert.DeserializeObject<List<PrintTemplate>>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return printsData;
+        }
+
+        public async Task<string> GetInvoicePrintByCustomer(int invoiceId)
+        {
+            PrintValidator.GetPrintValidator(invoiceId);
+            string url = Endpoint.INVOICE_PRINT_CUSTOMER + invoiceId;
+            return await GetPrint(url);
+        }
+
+        public async Task<string> GetProformaPrintByCustomer(int invoiceId)
+        {
+            PrintValidator.GetPrintValidator(invoiceId);
+            string url = Endpoint.PROFORMA_INVOICE_PRINT_CUSTOMER + invoiceId;
+            return await GetPrint(url);
+        }
+
+        public async Task<string> GetInvoiceCustomPrint(int invoiceId, int printTemplateId)
+        {
+            PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
+            string url = string.Format(Endpoint.INVOICE_PRINT_CUSTOM, invoiceId, printTemplateId);
+            return  await GetPrint(url);
+        }
+
+        public async Task<string> GetProformaCustomPrint(int invoiceId, int printTemplateId)
+        {
+            PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
+            string url = string.Format(Endpoint.PROFORMA_PRINT_CUSTOM, invoiceId, printTemplateId);
+            return await GetPrint(url);
+        }
+
+        public async Task SavePrintToFile(string base64Print, string pathToSave)
+        {
+            try
+            {
+                string correctBase64 = base64Print.Substring(28);
+
+                byte[] PDFDecoded = Convert.FromBase64String(correctBase64);
+                string fileName = pathToSave + "PDF" + DateTime.Now.ToString("dd-MM-yyyy-hh-mm") + ".pdf";
+
+               await Task.Run(() => File.WriteAllBytes(fileName, PDFDecoded));
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private async Task<string> GetPrint(string url)
+        {
+            await GetTokenIfNeeded();
+
+            string printData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    printData = JsonConvert.DeserializeObject<string>(responseBody);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            return printData;
         }
 
         private async Task<Customer> GetCustomer(long value, string url)
