@@ -1,15 +1,14 @@
-﻿using System;
-
-namespace ERPXTpl.Validators
+﻿namespace ERPXTpl.Validators
 {
     internal class PaymentMethodValidator
     {
-        internal static void GetPaymentMethodById(int paymentMethodId)
+        internal static string GetPaymentMethodById(int paymentMethodId)
         {
             if (paymentMethodId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return "Payment Method Id cannot be zero";
             }
+            return "";
         }
     }
 }

@@ -1,23 +1,23 @@
-﻿using System;
-
-namespace ERPXTpl.Validators
+﻿namespace ERPXTpl.Validators
 {
     internal class PrintValidator
     {
-        internal static void GetPrintValidator(int invoiceId)
+        internal static string GetPrintValidator(int invoiceId)
         {
             if (invoiceId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return "Invoice Id cannot be zero";
             }
+            return "";
         }
 
-        internal static void GetCustomPrintValidator(int invoiceId, int printTemplateId)
+        internal static string GetCustomPrintValidator(int invoiceId, int printTemplateId)
         {
             if (invoiceId == 0 || printTemplateId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return "Invoice Id or Print Template Id cannot be zero";
             }
+            return "";
         }
     }
 }
