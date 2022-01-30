@@ -16,6 +16,6 @@
         public static readonly string PRODUCT_OBJECT_VALIDATE = "Product object cannot be null";
         public static readonly string PRODUCT_NAME_VALIDATE = "Product Name cannot be null or empty";
         public static readonly string PRODUCT_UNIT_VALIDATE = "Product UnitOfMeasurment cannot be null or empty";
-
+        public static readonly string PRODUCT_RATE_VALIDATE = "Product Rate must be valid and cannot be null or empty";
     }
 }

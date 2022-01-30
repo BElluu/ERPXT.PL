@@ -53,7 +53,10 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    productData = JsonConvert.DeserializeObject<Product>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        productData = JsonConvert.DeserializeObject<Product>(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, productData);
                 }
@@ -348,7 +351,10 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    paymentMethodData = JsonConvert.DeserializeObject<List<PaymentMethod>>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        paymentMethodData = JsonConvert.DeserializeObject<List<PaymentMethod>>(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, paymentMethodData);
                 }
@@ -388,7 +394,10 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    paymentMethodData = JsonConvert.DeserializeObject<PaymentMethod>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        paymentMethodData = JsonConvert.DeserializeObject<PaymentMethod>(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, paymentMethodData);
                 }
@@ -419,7 +428,10 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    bankAccountsData = JsonConvert.DeserializeObject<List<BankAccount>>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        bankAccountsData = JsonConvert.DeserializeObject<List<BankAccount>>(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, bankAccountsData);
                 }
@@ -459,7 +471,10 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    bankAccountData = JsonConvert.DeserializeObject<BankAccount>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        bankAccountData = JsonConvert.DeserializeObject<BankAccount>(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, bankAccountData);
                 }
@@ -491,7 +506,10 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    printsData = JsonConvert.DeserializeObject<List<PrintTemplate>>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        printsData = JsonConvert.DeserializeObject<List<PrintTemplate>>(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, printsData);
                 }
@@ -565,14 +583,13 @@ namespace ERPXTpl
             }
             try
             {
-                //string correctBase64 = base64Print.Substring(28);
-
                 byte[] PDFDecoded = Convert.FromBase64String(base64Print);
                 string fileName = "PDF" + DateTime.Now.ToString("dd-MM-yyyy-hh-mm") + ".pdf";
                 string file = pathToSave + fileName;
 
                 await Task.Run(() => File.WriteAllBytes(fileName, PDFDecoded));
                 result.Message = fileName;
+                result.StatusCode = "OK";
             }
             catch (Exception ex)
             {
@@ -600,8 +617,12 @@ namespace ERPXTpl
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    printData = JsonConvert.DeserializeObject<string>(responseBody);
 
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        printData = JsonConvert.DeserializeObject<string>(responseBody).Substring(28);
+
+                    }
                     return ResponseResult(response, responseBody, printData);
                 }
                 catch (Exception ex)
@@ -630,7 +651,6 @@ namespace ERPXTpl
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
 
                     /*                    if (response.StatusCode == HttpStatusCode.OK)
                                         {
@@ -645,8 +665,11 @@ namespace ERPXTpl
                                             result.StatusCode = ((int)response.StatusCode).ToString();
                                             result.Message = errorMessage.Message;
                                         }*/
-
-                    return ResponseResult(response, responseBody, customerData);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
+                    }
+                        return ResponseResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {
