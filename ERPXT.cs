@@ -97,7 +97,11 @@ namespace ERPXTpl
 
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    productData.Id = Int32.Parse(responseBody);
+
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        productData.Id = Int32.Parse(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, productData);
                 }
@@ -242,7 +246,10 @@ namespace ERPXTpl
 
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    customerData.Id = Int32.Parse(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        customerData.Id = Int32.Parse(responseBody);
+                    }
 
                     return ResponseResult(response, responseBody, customerData);
                 }
@@ -621,7 +628,6 @@ namespace ERPXTpl
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         printData = JsonConvert.DeserializeObject<string>(responseBody).Substring(28);
-
                     }
                     return ResponseResult(response, responseBody, printData);
                 }
@@ -669,7 +675,7 @@ namespace ERPXTpl
                     {
                         customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
                     }
-                        return ResponseResult(response, responseBody, customerData);
+                    return ResponseResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {

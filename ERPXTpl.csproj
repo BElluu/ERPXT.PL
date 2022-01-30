@@ -9,6 +9,9 @@
     <PackageTags>erp;api;sdk;erpxt</PackageTags>
     <PackageLicenseFile>D:\Programowanie\erpxtpl-sdk\ERPXT.pl-SDK\LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Authors>Bartłomiej Komendarczuk</Authors>
+    <Product>$(AssemblyName)-SDK</Product>
+    <PackageId>$(AssemblyName)-SDK</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
