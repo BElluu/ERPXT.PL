@@ -650,6 +650,76 @@ namespace ERPXTpl
             }
         }
 
+        public async Task<Result> GetSalesInvoice(int invoiceId)
+        {
+            Result result = new Result();
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            SalesInvoice invoice = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES +"/"+ invoiceId);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        invoice = JsonConvert.DeserializeObject<SalesInvoice>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, invoice);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
+        public async Task<Result> GetSalesInvoice(string invoiceNumber)
+        {
+            Result result = new Result();
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            SalesInvoice invoice = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES +"?number="+invoiceNumber);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        invoice = JsonConvert.DeserializeObject<SalesInvoice>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, invoice);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
         public async Task<Result> SavePrintToFile(string base64Print, string pathToSave)
         {
             Result result = new Result();
