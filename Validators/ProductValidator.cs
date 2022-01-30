@@ -1,4 +1,5 @@
 ﻿using ERPXTpl.Models;
+using ERPXTpl.Resources;
 using System;
 
 namespace ERPXTpl.Validators
@@ -6,52 +7,55 @@ namespace ERPXTpl.Validators
     internal static class ProductValidator
     {
 
-        internal static void DeleteAndGetProductValidator(int productId)
+        internal static string DeleteAndGetProductValidator(int productId)
         {
             if (productId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return ValidatorMessage.PRODUCT_ID_VALIDATE;
             }
+            return "";
         }
-        internal static void AddProductValidator(Product product)
+        internal static string AddProductValidator(Product product)
         {
             if (product == null)
             {
-                throw new ArgumentNullException("Product cannot be null");
+                return ValidatorMessage.PRODUCT_OBJECT_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.Name))
             {
-                throw new ArgumentException("Name cannot be null or empty");
+                return ValidatorMessage.PRODUCT_NAME_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.UnitOfMeasurment))
             {
-                throw new ArgumentException("UnitOfMeasurment cannot be null or empty");
+                return ValidatorMessage.PRODUCT_UNIT_VALIDATE;
             }
+            return "";
         }
 
-        internal static void ModifyProductValidator(Product product)
+        internal static string ModifyProductValidator(Product product)
         {
             if (product == null)
             {
-                throw new ArgumentNullException("Product cannot be null");
+                return ValidatorMessage.PRODUCT_OBJECT_VALIDATE;
             }
 
             if (product.Id == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return ValidatorMessage.PRODUCT_ID_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.Name))
             {
-                throw new ArgumentException("Name cannot be null or empty");
+                return ValidatorMessage.PRODUCT_NAME_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.UnitOfMeasurment))
             {
-                throw new ArgumentException("UnitOfMeasurment cannot be null or empty");
+                return ValidatorMessage.PRODUCT_UNIT_VALIDATE;
             }
+            return "";
         }
     }
 }

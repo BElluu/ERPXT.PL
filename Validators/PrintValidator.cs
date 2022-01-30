@@ -1,23 +1,31 @@
-﻿using System;
+﻿using ERPXTpl.Resources;
 
 namespace ERPXTpl.Validators
 {
     internal class PrintValidator
     {
-        internal static void GetPrintValidator(int invoiceId)
+        internal static string GetPrintValidator(int invoiceId)
         {
             if (invoiceId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return ValidatorMessage.INVOICE_ID_VALIDATE;
             }
+            return "";
         }
 
-        internal static void GetCustomPrintValidator(int invoiceId, int printTemplateId)
+        internal static string GetCustomPrintValidator(int invoiceId, int printTemplateId)
         {
-            if (invoiceId == 0 || printTemplateId == 0)
+            if (invoiceId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return ValidatorMessage.INVOICE_ID_VALIDATE;
             }
+
+            if (printTemplateId == 0)
+            {
+                return ValidatorMessage.PRINT_TEMPLATE_ID_VALIDATE;
+            }
+
+            return "";
         }
     }
 }

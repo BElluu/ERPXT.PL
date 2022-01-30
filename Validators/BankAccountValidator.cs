@@ -1,14 +1,18 @@
-﻿using System;
+﻿using ERPXTpl.Resources;
 
 namespace ERPXTpl.Validators
 {
     internal class BankAccountValidator
     {
-        internal static void GetBankAccountById(int bankAccountId)
+        internal static string GetBankAccountById(int bankAccountId)
         {
             if (bankAccountId == 0)
             {
-                throw new ArgumentException("Id cannot be zero");
+                return ValidatorMessage.BANK_ACCOUNT_ID_VALIDATE;
+            }
+            else
+            {
+                return "";
             }
         }
     }

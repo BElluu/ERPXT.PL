@@ -1,15 +1,16 @@
-﻿using System;
+﻿using ERPXTpl.Resources;
 
 namespace ERPXTpl.Validators
 {
     internal static class AuthorizationValidator
     {
-        internal static void GetTokenValidator(string clientId, string secretKey)
+        internal static string GetTokenValidator(string clientId, string secretKey)
         {
-            if (string.IsNullOrEmpty(clientId) && string.IsNullOrEmpty(secretKey))
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(secretKey))
             {
-                throw new ArgumentNullException("ClientId and SecretKey cannot be null or empty");
+                return ValidatorMessage.CLIENTID_SECRETKEY_VALIDATE;
             }
+            return "";
         }
     }
 }

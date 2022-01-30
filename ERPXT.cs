@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -26,10 +27,20 @@ namespace ERPXTpl
             cache.Set(CacheData.Expires, new DateTime());
         }
 
-        public async Task<Product> GetProduct(int productId)
+        public async Task<Result> GetProduct(int productId)
         {
-            ProductValidator.DeleteAndGetProductValidator(productId);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+            var validateResult = ProductValidator.DeleteAndGetProductValidator(productId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
             Product productData = null;
             using (var client = new HttpClient())
@@ -42,21 +53,36 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    productData = JsonConvert.DeserializeObject<Product>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        productData = JsonConvert.DeserializeObject<Product>(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, productData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return productData;
+            return result;
         }
 
-        public async Task<int> AddProduct(Product product)
+        public async Task<Result> AddProduct(Product product)
         {
-            ProductValidator.AddProductValidator(product);
-            await GetTokenIfNeeded();
-
+            Result result = new Result();
+            var validateResult = ProductValidator.AddProductValidator(product);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+            Product productData = new Product();
             using (var client = new HttpClient())
             {
                 try
@@ -66,27 +92,41 @@ namespace ERPXTpl
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    string productData = JsonConvert.SerializeObject(product, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    StringContent stringContent = new StringContent(productData, Encoding.UTF8, "application/json");
+                    string productDataToAdd = JsonConvert.SerializeObject(product, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(productDataToAdd, Encoding.UTF8, "application/json");
 
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return Int32.Parse(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        productData.Id = Int32.Parse(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, productData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
-
             }
-            return 0;
+            return result;
         }
 
-        public async Task<string> ModifyProduct(Product product)
+        public async Task<Result> ModifyProduct(Product product)
         {
-            ProductValidator.ModifyProductValidator(product);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+            var validateResult = ProductValidator.ModifyProductValidator(product);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
@@ -104,23 +144,31 @@ namespace ERPXTpl
                     response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        return response.StatusCode.ToString();
-                    }
+                    return ResponseResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return response.StatusCode.ToString();
+            return result;
         }
 
-        public async Task<string> DeleteProduct(int productId)
+        public async Task<Result> DeleteProduct(int productId)
         {
-            ProductValidator.DeleteAndGetProductValidator(productId);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+            var validateResult = ProductValidator.DeleteAndGetProductValidator(productId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
@@ -133,36 +181,57 @@ namespace ERPXTpl
                     response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        return response.StatusCode.ToString();
-                    }
+                    return ResponseResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return response.StatusCode.ToString();
+            return result;
         }
 
-        public async Task<Customer> GetCustomerById(long customerId)
+        public async Task<Result> GetCustomerById(long customerId)
         {
-            CustomerValidator.DeleteAndGetCustomerByIdValidator(customerId);
+            var validateResult = CustomerValidator.DeleteAndGetCustomerByIdValidator(customerId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                Result result = new Result();
+                result.Message = validateResult;
+                return result;
+            }
             return await GetCustomer(customerId, Endpoint.CUSTOMERS);
         }
 
-        public async Task<Customer> GetCustomerByTIN(long TIN)
+        public async Task<Result> GetCustomerByTIN(long TIN)
         {
-            CustomerValidator.GetCustomerByTINValidator(TIN);
+            var validateResult = CustomerValidator.GetCustomerByTINValidator(TIN);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                Result result = new Result();
+                result.Message = validateResult;
+                return result;
+            }
             return await GetCustomer(TIN, Endpoint.CUSTOMERS + "?nip=");
         }
 
-        public async Task<int> AddCustomer(Customer customer)
+        public async Task<Result> AddCustomer(Customer customer)
         {
-            CustomerValidator.PostCustomerValidator(customer);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+            var validateResult = CustomerValidator.PostCustomerValidator(customer);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
 
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            Customer customerData = new Customer();
             using (var client = new HttpClient())
             {
                 try
@@ -172,26 +241,41 @@ namespace ERPXTpl
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    string customerData = JsonConvert.SerializeObject(customer, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    StringContent stringContent = new StringContent(customerData, Encoding.UTF8, "application/json");
+                    string customerDataToAdd = JsonConvert.SerializeObject(customer, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(customerDataToAdd, Encoding.UTF8, "application/json");
 
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        customerData.Id = Int32.Parse(responseBody);
+                    }
 
-                    return Int32.Parse(responseBody);
+                    return ResponseResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return 0;
+            return result;
         }
 
-        public async Task<string> ModifyCustomer(Customer customer)
+        public async Task<Result> ModifyCustomer(Customer customer)
         {
-            CustomerValidator.ModifyCustomerValidator(customer);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+            var validateResult = CustomerValidator.ModifyCustomerValidator(customer);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
@@ -203,30 +287,37 @@ namespace ERPXTpl
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                    string customerData = JsonConvert.SerializeObject(customer, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
-                    StringContent stringContent = new StringContent(customerData, Encoding.UTF8, "application/json");
+                    string customerDataToModify = JsonConvert.SerializeObject(customer, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(customerDataToModify, Encoding.UTF8, "application/json");
 
                     response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        return response.StatusCode.ToString();
-                    }
+                    return ResponseResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return response.StatusCode.ToString();
+            return result;
         }
 
-        public async Task<string> DeleteCustomer(int customerId)
+        public async Task<Result> DeleteCustomer(int customerId)
         {
-            ProductValidator.DeleteAndGetProductValidator(customerId);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+            var validateResult = ProductValidator.DeleteAndGetProductValidator(customerId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
 
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
             HttpResponseMessage response = null;
             using (var client = new HttpClient())
             {
@@ -238,23 +329,24 @@ namespace ERPXTpl
                     response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    if (response.StatusCode == System.Net.HttpStatusCode.NoContent)
-                    {
-                        return response.StatusCode.ToString();
-                    }
+                    return ResponseResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return response.StatusCode.ToString();
+            return result;
         }
 
-        public async Task<List<PaymentMethod>> GetPaymentMethod()
+        public async Task<Result> GetPaymentMethod()
         {
-            await GetTokenIfNeeded();
-
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+            Result result = new Result();
             List<PaymentMethod> paymentMethodData = null;
             using (var client = new HttpClient())
             {
@@ -266,20 +358,37 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    paymentMethodData = JsonConvert.DeserializeObject<List<PaymentMethod>>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        paymentMethodData = JsonConvert.DeserializeObject<List<PaymentMethod>>(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, paymentMethodData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return paymentMethodData;
+            return result;
         }
 
-        public async Task<PaymentMethod> GetPaymentMethod(int paymentMethodId)
+        public async Task<Result> GetPaymentMethod(int paymentMethodId)
         {
-            PaymentMethodValidator.GetPaymentMethodById(paymentMethodId);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+
+            var validateResult = PaymentMethodValidator.GetPaymentMethodById(paymentMethodId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
             PaymentMethod paymentMethodData = null;
             using (var client = new HttpClient())
@@ -292,21 +401,30 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    paymentMethodData = JsonConvert.DeserializeObject<PaymentMethod>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        paymentMethodData = JsonConvert.DeserializeObject<PaymentMethod>(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, paymentMethodData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return paymentMethodData;
+            return result;
         }
 
-        public async Task<List<BankAccount>> GetBankAccount()
+        public async Task<Result> GetBankAccounts()
         {
-            await GetTokenIfNeeded();
-
-            List<BankAccount> bankAccountData = null;
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+            Result result = new Result();
+            List<BankAccount> bankAccountsData = null;
             using (var client = new HttpClient())
             {
                 try
@@ -317,20 +435,37 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    bankAccountData = JsonConvert.DeserializeObject<List<BankAccount>>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        bankAccountsData = JsonConvert.DeserializeObject<List<BankAccount>>(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, bankAccountsData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return bankAccountData;
+            return result;
         }
 
-        public async Task<BankAccount> GetBankAccount(int bankAccountId)
+        public async Task<Result> GetBankAccount(int bankAccountId)
         {
-            BankAccountValidator.GetBankAccountById(bankAccountId);
-            await GetTokenIfNeeded();
+            Result result = new Result();
+
+            var validateResult = BankAccountValidator.GetBankAccountById(bankAccountId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("200"))
+            {
+                return tokenResponse;
+            }
 
             BankAccount bankAccountData = null;
             using (var client = new HttpClient())
@@ -343,20 +478,30 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    bankAccountData = JsonConvert.DeserializeObject<BankAccount>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        bankAccountData = JsonConvert.DeserializeObject<BankAccount>(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, bankAccountData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return bankAccountData;
+            return result;
         }
 
-        public async Task<List<PrintTemplate>> GetPrintTemplates()
+        public async Task<Result> GetPrintTemplates()
         {
-            await GetTokenIfNeeded();
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
+            Result result = new Result();
             List<PrintTemplate> printsData = null;
             using (var client = new HttpClient())
             {
@@ -368,65 +513,108 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    printsData = JsonConvert.DeserializeObject<List<PrintTemplate>>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        printsData = JsonConvert.DeserializeObject<List<PrintTemplate>>(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, printsData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return printsData;
+            return result;
         }
 
-        public async Task<string> GetInvoicePrintByCustomer(int invoiceId)
+        public async Task<Result> GetInvoicePrintByCustomer(int invoiceId)
         {
-            PrintValidator.GetPrintValidator(invoiceId);
+            var validateResult = PrintValidator.GetPrintValidator(invoiceId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                Result result = new Result();
+                result.Message = validateResult;
+                return result;
+            }
             string url = Endpoint.INVOICE_PRINT_CUSTOMER + invoiceId;
             return await GetPrint(url);
         }
 
-        public async Task<string> GetProformaPrintByCustomer(int invoiceId)
+        public async Task<Result> GetProformaPrintByCustomer(int invoiceId)
         {
-            PrintValidator.GetPrintValidator(invoiceId);
+            var validateResult = PrintValidator.GetPrintValidator(invoiceId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                Result result = new Result();
+                result.Message = validateResult;
+                return result;
+            }
             string url = Endpoint.PROFORMA_INVOICE_PRINT_CUSTOMER + invoiceId;
             return await GetPrint(url);
         }
 
-        public async Task<string> GetInvoiceCustomPrint(int invoiceId, int printTemplateId)
+        public async Task<Result> GetInvoiceCustomPrint(int invoiceId, int printTemplateId)
         {
-            PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
+            var validateResult = PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                Result result = new Result();
+                result.Message = validateResult;
+                return result;
+            }
             string url = string.Format(Endpoint.INVOICE_PRINT_CUSTOM, invoiceId, printTemplateId);
-            return  await GetPrint(url);
+            return await GetPrint(url);
         }
 
-        public async Task<string> GetProformaCustomPrint(int invoiceId, int printTemplateId)
+        public async Task<Result> GetProformaCustomPrint(int invoiceId, int printTemplateId)
         {
-            PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
+            var validateResult = PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                Result result = new Result();
+                result.Message = validateResult;
+                return result;
+            }
             string url = string.Format(Endpoint.PROFORMA_PRINT_CUSTOM, invoiceId, printTemplateId);
             return await GetPrint(url);
         }
 
-        public async Task SavePrintToFile(string base64Print, string pathToSave)
+        public async Task<Result> SavePrintToFile(string base64Print, string pathToSave)
         {
+            Result result = new Result();
+            if (string.IsNullOrEmpty(base64Print) || string.IsNullOrEmpty(pathToSave))
+            {
+                result.Message = "Base64 or Path cannot be null or empty";
+                return result;
+            }
             try
             {
-                string correctBase64 = base64Print.Substring(28);
+                byte[] PDFDecoded = Convert.FromBase64String(base64Print);
+                string fileName = "PDF" + DateTime.Now.ToString("dd-MM-yyyy-hh-mm") + ".pdf";
+                string file = pathToSave + fileName;
 
-                byte[] PDFDecoded = Convert.FromBase64String(correctBase64);
-                string fileName = pathToSave + "PDF" + DateTime.Now.ToString("dd-MM-yyyy-hh-mm") + ".pdf";
-
-               await Task.Run(() => File.WriteAllBytes(fileName, PDFDecoded));
-            }catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
+                await Task.Run(() => File.WriteAllBytes(fileName, PDFDecoded));
+                result.Message = fileName;
+                result.StatusCode = "OK";
             }
+            catch (Exception ex)
+            {
+                result.Message = ex.Message;
+            }
+            return result;
         }
 
-        private async Task<string> GetPrint(string url)
+        private async Task<Result> GetPrint(string url)
         {
-            await GetTokenIfNeeded();
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
             string printData = null;
+            Result result = new Result();
             using (var client = new HttpClient())
             {
                 try
@@ -437,44 +625,69 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    printData = JsonConvert.DeserializeObject<string>(responseBody);
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        printData = JsonConvert.DeserializeObject<string>(responseBody).Substring(28);
+                    }
+                    return ResponseResult(response, responseBody, printData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return printData;
+            return result;
         }
 
-        private async Task<Customer> GetCustomer(long value, string url)
+        private async Task<Result> GetCustomer(long value, string url)
         {
-            await GetTokenIfNeeded();
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
 
+            Result result = new Result();
             Customer customerData = null;
             using (var client = new HttpClient())
             {
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url + value);
-
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
+                    /*                    if (response.StatusCode == HttpStatusCode.OK)
+                                        {
+                                            result.Data = customerData;
+                                            result.StatusCode = ((int)response.StatusCode).ToString();
+                                            result.Message = response.ReasonPhrase;
+                                        }
+                                        else
+                                        {
+                                            var errorMessage = JsonConvert.DeserializeObject<Result.Error>(responseBody);
+                                            result.Data = null;
+                                            result.StatusCode = ((int)response.StatusCode).ToString();
+                                            result.Message = errorMessage.Message;
+                                        }*/
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    result.Message = ex.Message;
                 }
             }
-            return customerData;
+            return result;
         }
 
-        private async Task GetAuthToken(string clientId, string secretKey)
+        private async Task<Result> GetAuthToken(string clientId, string secretKey)
         {
-            AuthorizationValidator.GetTokenValidator(clientId, secretKey);
+            Result result = new Result();
 
             if (!cache.TryGetValue(CacheData.AccessToken, out cacheExpire))
             {
@@ -495,41 +708,85 @@ namespace ERPXTpl
                         var response = await client.SendAsync(request);
                         string responseBody = await response.Content.ReadAsStringAsync();
 
-                        var authObject = JsonConvert.DeserializeObject<Authorization>(responseBody);
 
-                        try
+                        if (response.IsSuccessStatusCode)
                         {
-                            var secondsBeforeExpire = authObject.expires - 60;
-                            cacheExpire = DateTime.Now.AddSeconds(secondsBeforeExpire);
-                            cache.Set(CacheData.Expires, cacheExpire.ToString());
-                            cache.Set(CacheData.AccessToken, authObject.access_token);
+                            var authObject = JsonConvert.DeserializeObject<Models.Authorization>(responseBody);
+
+                            try
+                            {
+                                var secondsBeforeExpire = authObject.expires - 60;
+                                cacheExpire = DateTime.Now.AddSeconds(secondsBeforeExpire);
+                                cache.Set(CacheData.Expires, cacheExpire.ToString());
+                                cache.Set(CacheData.AccessToken, authObject.access_token);
+                                result.Data = "Token saved in cache";
+                                result.StatusCode = response.StatusCode.ToString();
+                                result.Message = response.ReasonPhrase;
+
+                            }
+                            catch (Exception ex)
+                            {
+                                result.Message = ex.Message;
+                            }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            Console.WriteLine(ex.Message);
+                            var errorMessage = JsonConvert.DeserializeObject<Result.Error>(responseBody);
+                            result.Data = null;
+                            result.StatusCode = response.StatusCode.ToString();
+                            result.Message = errorMessage.Message;
                         }
                     }
 
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        result.Message = ex.Message;
                     }
                 }
             }
-
+            return result;
         }
 
-        private async Task GetTokenIfNeeded()
+        private async Task<Result> GetTokenIfNeeded()
         {
+            Result result = new Result();
             if (DateTime.Now >= GetExpireDate())
             {
-                await GetAuthToken(ClientID, SecretKey);
+                var tokenValidator = AuthorizationValidator.GetTokenValidator(ClientID, SecretKey);
+                if (!string.IsNullOrEmpty(tokenValidator))
+                {
+                    result.Message = tokenValidator;
+                    return result;
+                }
+                return await GetAuthToken(ClientID, SecretKey);
             }
+            result.Message = "Valid token is in cache";
+            result.StatusCode = "OK";
+            return result;
         }
 
         private DateTime GetExpireDate()
         {
             return DateTime.Parse(cache.Get(CacheData.Expires).ToString());
+        }
+
+        private Result ResponseResult(HttpResponseMessage response, string responseBody, object data = null)
+        {
+            Result result = new Result();
+            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+            {
+                result.Data = data;
+                result.StatusCode = response.StatusCode.ToString();
+                result.Message = response.ReasonPhrase;
+            }
+            else
+            {
+                var errorMessage = JsonConvert.DeserializeObject<Result.Error>(responseBody);
+                result.Data = null;
+                result.StatusCode = response.StatusCode.ToString();
+                result.Message = errorMessage.Message;
+            }
+            return result;
         }
     }
 }
