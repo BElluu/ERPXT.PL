@@ -580,6 +580,76 @@ namespace ERPXTpl
             return await GetPrint(url);
         }
 
+        public async Task<Result> GetVatRates()
+        {
+            Result result = new Result();
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            List<VatRate> vatRates = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.VAT_RATES);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        vatRates = JsonConvert.DeserializeObject<List<VatRate>>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, vatRates);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
+        public async Task<Result> GetCountries()
+        {
+            Result result = new Result();
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            List<string> countries = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.VAT_RATES + "countries");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        countries = JsonConvert.DeserializeObject<List<string>>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, countries);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
         public async Task<Result> SavePrintToFile(string base64Print, string pathToSave)
         {
             Result result = new Result();
