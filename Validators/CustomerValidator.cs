@@ -1,4 +1,5 @@
 ﻿using ERPXTpl.Models;
+using ERPXTpl.Resources;
 
 namespace ERPXTpl.Validators
 {
@@ -8,7 +9,7 @@ namespace ERPXTpl.Validators
         {
             if (value == 0)
             {
-                return "Customer Id cannot be zero or empty";
+                return ValidatorMessage.CUSTOMER_ID_VALIDATE;
             }
             return "";
         }
@@ -17,7 +18,7 @@ namespace ERPXTpl.Validators
         {
             if (value == 0)
             {
-                return "Customer TIN cannot be zero or empty";
+                return ValidatorMessage.CUSTOMER_TIN_VALIDATE;
             }
             return "";
         }
@@ -26,12 +27,12 @@ namespace ERPXTpl.Validators
         {
             if(customer == null)
             {
-                return "Customer object cannot be null";
+                return ValidatorMessage.CUSTOMER_OBJECT_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(customer.Name))
             {
-                return "Customer Name cannot be null or empty";
+                return ValidatorMessage.CUSTOMER_NAME_VALIDATE;
             }
 
             if (customer.CustomerStatus == Enums.CustomerStatusEnum.INTRA_EU || 
@@ -40,7 +41,7 @@ namespace ERPXTpl.Validators
             {
                 if (string.IsNullOrEmpty(customer.CountryCode))
                 {
-                    return "The country code is mandatory for intra-EU and the OSS procedure customers";
+                    return ValidatorMessage.CUSTOMER_COUNTRY_CODE_VALIDATE;
                 }
             }
             return "";
@@ -50,17 +51,17 @@ namespace ERPXTpl.Validators
         {
             if (customer == null)
             {
-                return "Customer object cannot be null";
+                return ValidatorMessage.CUSTOMER_OBJECT_VALIDATE;
             }
 
             if (customer.Id == 0)
             {
-                return "Customer Id cannot be zero or empty";
+                return ValidatorMessage.CUSTOMER_ID_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(customer.Name))
             {
-                return "Customer Name cannot be null or empty";
+                return ValidatorMessage.CUSTOMER_NAME_VALIDATE;
             }
 
             if ((customer.CustomerStatus == Enums.CustomerStatusEnum.INTRA_EU ||
@@ -68,7 +69,7 @@ namespace ERPXTpl.Validators
                 customer.CustomerStatus == Enums.CustomerStatusEnum.OSS_PROCEDURE) &&
                 string.IsNullOrEmpty(customer.CountryCode))
             {
-                    return "The country code is mandatory for intra-EU and the OSS procedure customers";
+                    return ValidatorMessage.CUSTOMER_COUNTRY_CODE_VALIDATE;
             }
             return "";
         }

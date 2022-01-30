@@ -1,4 +1,5 @@
 ﻿using ERPXTpl.Models;
+using ERPXTpl.Resources;
 
 namespace ERPXTpl.Validators
 {
@@ -9,7 +10,7 @@ namespace ERPXTpl.Validators
         {
             if (productId == 0)
             {
-                return "Product Id cannot be zero";
+                return ValidatorMessage.PRODUCT_ID_VALIDATE;
             }
             return "";
         }
@@ -17,17 +18,17 @@ namespace ERPXTpl.Validators
         {
             if (product == null)
             {
-                return "Product object cannot be null";
+                return ValidatorMessage.PRODUCT_OBJECT_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.Name))
             {
-                return "Product Name cannot be null or empty";
+                return ValidatorMessage.PRODUCT_NAME_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.UnitOfMeasurment))
             {
-                return "Product UnitOfMeasurment cannot be null or empty";
+                return ValidatorMessage.PRODUCT_UNIT_VALIDATE;
             }
             return "";
         }
@@ -36,22 +37,22 @@ namespace ERPXTpl.Validators
         {
             if (product == null)
             {
-                return "Product object cannot be null";
+                return ValidatorMessage.PRODUCT_OBJECT_VALIDATE;
             }
 
             if (product.Id == 0)
             {
-                return "Product Id cannot be zero";
+                return ValidatorMessage.PRODUCT_ID_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.Name))
             {
-                return "Product Name cannot be null or empty";
+                return ValidatorMessage.PRODUCT_NAME_VALIDATE;
             }
 
             if (string.IsNullOrEmpty(product.UnitOfMeasurment))
             {
-                return "Product UnitOfMeasurment cannot be null or empty";
+                return ValidatorMessage.PRODUCT_UNIT_VALIDATE;
             }
             return "";
         }

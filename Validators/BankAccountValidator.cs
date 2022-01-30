@@ -1,4 +1,6 @@
-﻿namespace ERPXTpl.Validators
+﻿using ERPXTpl.Resources;
+
+namespace ERPXTpl.Validators
 {
     internal class BankAccountValidator
     {
@@ -6,7 +8,7 @@
         {
             if (bankAccountId == 0)
             {
-                return "Bank Account ID cannot be zero";
+                return ValidatorMessage.BANK_ACCOUNT_ID_VALIDATE;
             }
             else
             {

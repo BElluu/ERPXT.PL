@@ -1,4 +1,6 @@
-﻿namespace ERPXTpl.Validators
+﻿using ERPXTpl.Resources;
+
+namespace ERPXTpl.Validators
 {
     internal class PaymentMethodValidator
     {
@@ -6,7 +8,7 @@
         {
             if (paymentMethodId == 0)
             {
-                return "Payment Method Id cannot be zero";
+                return ValidatorMessage.PAYMENT_METHOD_ID_VALIDATE;
             }
             return "";
         }

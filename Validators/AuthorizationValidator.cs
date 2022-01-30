@@ -1,4 +1,6 @@
-﻿namespace ERPXTpl.Validators
+﻿using ERPXTpl.Resources;
+
+namespace ERPXTpl.Validators
 {
     internal static class AuthorizationValidator
     {
@@ -6,7 +8,7 @@
         {
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(secretKey))
             {
-                return "ClientId and SecretKey cannot be null or empty";
+                return ValidatorMessage.CLIENTID_SECRETKEY_VALIDATE;
             }
             return "";
         }
