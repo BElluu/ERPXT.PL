@@ -27,7 +27,7 @@ namespace ERPXTpl
             cache.Set(CacheData.Expires, new DateTime());
         }
 
-        public async Task<Result> GetProduct(int productId)
+        public async Task<Result> GetProduct(long productId)
         {
             Result result = new Result();
             var validateResult = ProductValidator.DeleteAndGetProductValidator(productId);
@@ -100,7 +100,7 @@ namespace ERPXTpl
 
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
-                        productData.Id = Int32.Parse(responseBody);
+                        productData.Id = Int64.Parse(responseBody);
                     }
 
                     return ResponseResult(response, responseBody, productData);
@@ -154,7 +154,7 @@ namespace ERPXTpl
             return result;
         }
 
-        public async Task<Result> DeleteProduct(int productId)
+        public async Task<Result> DeleteProduct(long productId)
         {
             Result result = new Result();
             var validateResult = ProductValidator.DeleteAndGetProductValidator(productId);
@@ -248,7 +248,7 @@ namespace ERPXTpl
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
-                        customerData.Id = Int32.Parse(responseBody);
+                        customerData.Id = Int64.Parse(responseBody);
                     }
 
                     return ResponseResult(response, responseBody, customerData);
@@ -373,7 +373,7 @@ namespace ERPXTpl
             return result;
         }
 
-        public async Task<Result> GetPaymentMethod(int paymentMethodId)
+        public async Task<Result> GetPaymentMethod(long paymentMethodId)
         {
             Result result = new Result();
 
@@ -450,7 +450,7 @@ namespace ERPXTpl
             return result;
         }
 
-        public async Task<Result> GetBankAccount(int bankAccountId)
+        public async Task<Result> GetBankAccount(long bankAccountId)
         {
             Result result = new Result();
 
@@ -541,7 +541,7 @@ namespace ERPXTpl
             return await GetPrint(url);
         }
 
-        public async Task<Result> GetProformaPrintByCustomer(int invoiceId)
+        public async Task<Result> GetProformaPrintByCustomer(long invoiceId)
         {
             var validateResult = PrintValidator.GetPrintValidator(invoiceId);
             if (!string.IsNullOrEmpty(validateResult))
@@ -554,7 +554,7 @@ namespace ERPXTpl
             return await GetPrint(url);
         }
 
-        public async Task<Result> GetInvoiceCustomPrint(int invoiceId, int printTemplateId)
+        public async Task<Result> GetInvoiceCustomPrint(long invoiceId, long printTemplateId)
         {
             var validateResult = PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
             if (!string.IsNullOrEmpty(validateResult))
@@ -567,7 +567,7 @@ namespace ERPXTpl
             return await GetPrint(url);
         }
 
-        public async Task<Result> GetProformaCustomPrint(int invoiceId, int printTemplateId)
+        public async Task<Result> GetProformaCustomPrint(long invoiceId, long printTemplateId)
         {
             var validateResult = PrintValidator.GetCustomPrintValidator(printTemplateId, invoiceId);
             if (!string.IsNullOrEmpty(validateResult))
@@ -578,6 +578,284 @@ namespace ERPXTpl
             }
             string url = string.Format(Endpoint.PROFORMA_PRINT_CUSTOM, invoiceId, printTemplateId);
             return await GetPrint(url);
+        }
+
+        public async Task<Result> GetVatRates()
+        {
+            Result result = new Result();
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            List<VatRate> vatRates = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.VAT_RATES);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        vatRates = JsonConvert.DeserializeObject<List<VatRate>>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, vatRates);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
+        public async Task<Result> GetCountries()
+        {
+            Result result = new Result();
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            List<string> countries = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.VAT_RATES + "countries");
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        countries = JsonConvert.DeserializeObject<List<string>>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, countries);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
+        public async Task<Result> GetSalesInvoice(long invoiceId)
+        {
+            Result result = new Result();
+
+            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(invoiceId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            SalesInvoice invoice = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES +"/"+ invoiceId);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        invoice = JsonConvert.DeserializeObject<SalesInvoice>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, invoice);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
+        public async Task<Result> GetSalesInvoice(string invoiceNumber)
+        {
+            Result result = new Result();
+
+            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(invoiceNumber);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            SalesInvoice invoice = null;
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES +"?number="+invoiceNumber);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        invoice = JsonConvert.DeserializeObject<SalesInvoice>(responseBody);
+                    }
+                    return ResponseResult(response, responseBody, invoice);
+
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+                return result;
+            }
+        }
+
+        public async Task<Result> AddSalesInvoice(SalesInvoice salesInvoice)
+        {
+            Result result = new Result();
+            var validateResult = SalesInvoiceValidator.PostSalesInvoiceValidator(salesInvoice);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            SalesInvoice salesInvoiceData = new SalesInvoice();
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Endpoint.SALES_INVOICES);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    string salesInvoiceDataToAdd = JsonConvert.SerializeObject(salesInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(salesInvoiceDataToAdd, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        salesInvoiceData.Id = Int64.Parse(responseBody);
+                    }
+
+                    return ResponseResult(response, responseBody, salesInvoiceData);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public async Task<Result> ModifySalesInvoice(SalesInvoice salesInvoice)
+        {
+            Result result = new Result();
+            var validateResult = SalesInvoiceValidator.PutSalesInvoiceValidator(salesInvoice);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.SALES_INVOICES);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    string salesInvoiceDataToAdd = JsonConvert.SerializeObject(salesInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(salesInvoiceDataToAdd, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    return ResponseResult(response, responseBody);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public async Task<Result> DeleteSalesinvoice(long productId)
+        {
+            Result result = new Result();
+            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(productId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            HttpResponseMessage response = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.SALES_INVOICES +"/"+ productId);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    return ResponseResult(response, responseBody);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
         }
 
         public async Task<Result> SavePrintToFile(string base64Print, string pathToSave)
@@ -658,19 +936,6 @@ namespace ERPXTpl
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    /*                    if (response.StatusCode == HttpStatusCode.OK)
-                                        {
-                                            result.Data = customerData;
-                                            result.StatusCode = ((int)response.StatusCode).ToString();
-                                            result.Message = response.ReasonPhrase;
-                                        }
-                                        else
-                                        {
-                                            var errorMessage = JsonConvert.DeserializeObject<Result.Error>(responseBody);
-                                            result.Data = null;
-                                            result.StatusCode = ((int)response.StatusCode).ToString();
-                                            result.Message = errorMessage.Message;
-                                        }*/
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         customerData = JsonConvert.DeserializeObject<Customer>(responseBody);

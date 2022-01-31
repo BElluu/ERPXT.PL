@@ -12,6 +12,8 @@
     <Authors>Bartłomiej Komendarczuk</Authors>
     <Product>$(AssemblyName)-SDK</Product>
     <PackageId>$(AssemblyName)-SDK</PackageId>
+    <Description>A library that is to facilitate the use of the ERP XT API without unnecessary implementation.</Description>
+    <Copyright>https://choosealicense.com/licenses/apache-2.0/</Copyright>
   </PropertyGroup>
 
   <ItemGroup>

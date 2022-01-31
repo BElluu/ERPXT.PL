@@ -17,5 +17,11 @@
         public static readonly string PRODUCT_NAME_VALIDATE = "Product Name cannot be null or empty";
         public static readonly string PRODUCT_UNIT_VALIDATE = "Product UnitOfMeasurment cannot be null or empty";
         public static readonly string PRODUCT_RATE_VALIDATE = "Product Rate must be valid and cannot be null or empty";
+        public static readonly string INVOICE_NUMBER_VALIDATE = "Invoice Number cannot be null or empty";
+        public static readonly string INVOICE_OBJECT_VALIDATE = "Invoice object cannot be empty";
+        public static readonly string INVOICE_PURCHASING_PARTY_ID_VALIDATE = "Invoice PurchasingPartyId cannot be null";
+        public static readonly string INVOICE_PAYMENT_TYPE_ID_VALIDATE = "Invoice PaymentTypeId cannot be null";
+        public static readonly string PRODUCT_QUANTITY_VALIDATE = "Product Quantity cannot be null";
+        public static readonly string PRODUCT_CURRENCY_PRICE_VALIDATE = "ProductCurrencyPrice cannot be null";
     }
 }

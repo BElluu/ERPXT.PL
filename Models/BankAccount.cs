@@ -2,7 +2,7 @@
 {
     public class BankAccount
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string AccountNumber { get; set; }
         public string BankName { get; set; }
         public string Symbol { get; set; }
