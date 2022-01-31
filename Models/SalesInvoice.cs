@@ -10,6 +10,7 @@ namespace ERPXTpl.Models
             Items = new List<Item>();
         }
 
+        public long Id { get; set; }
         public PaymentStatusEnum PaymentStatus { get; set; }
         public string OSSProcedureCountryCode { get; set; }
         public bool IsOSSProcedure { get; set; }
@@ -24,6 +25,11 @@ namespace ERPXTpl.Models
         public string Number { get; set; }
         public DocumentStatusEnum Status { get; set; } 
         public List<Item> Items { get; set; }
+
+        internal bool ShouldSerializeId()
+        {
+            return Id != 0;
+        }
     }
 
     public class Item
@@ -34,5 +40,10 @@ namespace ERPXTpl.Models
         public decimal ProductCurrencyPrice { get; set; }
         public string ProductDescription { get; set; }
         public int VatRateId { get; set; }
+
+        internal bool ShouldSerializeId()
+        {
+            return Id != 0;
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace ERPXTpl.Models
             Address = new Address();
         }
 
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
         public string CountryCode { get; set; }
         public string CustomerTaxNumber { get; set; }
@@ -28,7 +28,7 @@ namespace ERPXTpl.Models
 
     public class Address
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Street { get; set; }
         public string BuildingNumber { get; set; }
         public string FlatNumber { get; set; }

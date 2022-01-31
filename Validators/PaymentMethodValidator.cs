@@ -4,7 +4,7 @@ namespace ERPXTpl.Validators
 {
     internal class PaymentMethodValidator
     {
-        internal static string GetPaymentMethodById(int paymentMethodId)
+        internal static string GetPaymentMethodById(long paymentMethodId)
         {
             if (paymentMethodId == 0)
             {

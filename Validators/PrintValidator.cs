@@ -4,7 +4,7 @@ namespace ERPXTpl.Validators
 {
     internal class PrintValidator
     {
-        internal static string GetPrintValidator(int invoiceId)
+        internal static string GetPrintValidator(long invoiceId)
         {
             if (invoiceId == 0)
             {
@@ -13,7 +13,7 @@ namespace ERPXTpl.Validators
             return "";
         }
 
-        internal static string GetCustomPrintValidator(int invoiceId, int printTemplateId)
+        internal static string GetCustomPrintValidator(long invoiceId, long printTemplateId)
         {
             if (invoiceId == 0)
             {

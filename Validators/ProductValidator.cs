@@ -7,7 +7,7 @@ namespace ERPXTpl.Validators
     internal static class ProductValidator
     {
 
-        internal static string DeleteAndGetProductValidator(int productId)
+        internal static string DeleteAndGetProductValidator(long productId)
         {
             if (productId == 0)
             {
