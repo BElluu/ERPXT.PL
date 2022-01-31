@@ -780,6 +780,84 @@ namespace ERPXTpl
             return result;
         }
 
+        public async Task<Result> ModifySalesInvoice(SalesInvoice salesInvoice)
+        {
+            Result result = new Result();
+            var validateResult = SalesInvoiceValidator.PutSalesInvoiceValidator(salesInvoice);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.SALES_INVOICES);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                    string salesInvoiceDataToAdd = JsonConvert.SerializeObject(salesInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    StringContent stringContent = new StringContent(salesInvoiceDataToAdd, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    return ResponseResult(response, responseBody);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
+        public async Task<Result> DeleteSalesinvoice(long productId)
+        {
+            Result result = new Result();
+            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(productId);
+            if (!string.IsNullOrEmpty(validateResult))
+            {
+                result.Message = validateResult;
+                return result;
+            }
+
+            var tokenResponse = await GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            HttpResponseMessage response = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.SALES_INVOICES +"/"+ productId);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    return ResponseResult(response, responseBody);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
         public async Task<Result> SavePrintToFile(string base64Print, string pathToSave)
         {
             Result result = new Result();
