@@ -3,9 +3,9 @@ using ERPXTpl.Resources;
 
 namespace ERPXTpl.Validators
 {
-    internal class SalesInvoiceValidator
+    internal class InvoiceValidator
     {
-        internal static string GetSalesInvoiceValidator(long invoiceId)
+        internal static string GetInvoiceValidator(long invoiceId)
         {
             if(invoiceId == 0)
             {
@@ -14,7 +14,7 @@ namespace ERPXTpl.Validators
             return "";
         }
 
-        internal static string GetSalesInvoiceValidator(string invoiceNumber)
+        internal static string GetInvoiceValidator(string invoiceNumber)
         {
             if (string.IsNullOrEmpty(invoiceNumber))
             {
@@ -23,23 +23,23 @@ namespace ERPXTpl.Validators
             return "";
         }
 
-        internal static string PostSalesInvoiceValidator(SalesInvoice salesInvoice)
+        internal static string PostInvoiceValidator(IInvoice invoice)
         {
-            if(salesInvoice == null)
+            if(invoice == null)
             {
                 return ValidatorMessage.INVOICE_OBJECT_VALIDATE;
             }
-            if(salesInvoice.PurchasingPartyId == 0)
+            if(invoice.PurchasingPartyId == 0)
             {
                 return ValidatorMessage.INVOICE_PURCHASING_PARTY_ID_VALIDATE;
             }
-            if (salesInvoice.PaymentTypeId == 0 || salesInvoice.PaymentTypeId == null)
+            if (invoice.PaymentTypeId == 0 || invoice.PaymentTypeId == null)
             {
                 return ValidatorMessage.INVOICE_PAYMENT_TYPE_ID_VALIDATE;
             }
-            if(salesInvoice.Items.Count > 0)
+            if(invoice.Items.Count > 0)
             {
-                foreach(var item in salesInvoice.Items)
+                foreach(var item in invoice.Items)
                 {
                     if(item.ProductId == 0)
                     {
@@ -58,28 +58,28 @@ namespace ERPXTpl.Validators
             return "";
         }
 
-        internal static string PutSalesInvoiceValidator(SalesInvoice salesInvoice)
+        internal static string PutSalesInvoiceValidator(IInvoice invoice)
         {
-            if (salesInvoice == null)
+            if (invoice == null)
             {
                 return ValidatorMessage.INVOICE_OBJECT_VALIDATE;
             }
 
-            if (salesInvoice.Id == 0)
+            if (invoice.Id == 0)
             {
                 return ValidatorMessage.INVOICE_ID_VALIDATE;
             }
-            if (salesInvoice.PurchasingPartyId == 0)
+            if (invoice.PurchasingPartyId == 0)
             {
                 return ValidatorMessage.INVOICE_PURCHASING_PARTY_ID_VALIDATE;
             }
-            if (salesInvoice.PaymentTypeId == 0 || salesInvoice.PaymentTypeId == null)
+            if (invoice.PaymentTypeId == 0 || invoice.PaymentTypeId == null)
             {
                 return ValidatorMessage.INVOICE_PAYMENT_TYPE_ID_VALIDATE;
             }
-            if (salesInvoice.Items.Count > 0)
+            if (invoice.Items.Count > 0)
             {
-                foreach (var item in salesInvoice.Items)
+                foreach (var item in invoice.Items)
                 {
                     if (item.ProductId == 0)
                     {

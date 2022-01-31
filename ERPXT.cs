@@ -654,7 +654,7 @@ namespace ERPXTpl
         {
             Result result = new Result();
 
-            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(invoiceId);
+            var validateResult = InvoiceValidator.GetInvoiceValidator(invoiceId);
             if (!string.IsNullOrEmpty(validateResult))
             {
                 result.Message = validateResult;
@@ -696,7 +696,7 @@ namespace ERPXTpl
         {
             Result result = new Result();
 
-            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(invoiceNumber);
+            var validateResult = InvoiceValidator.GetInvoiceValidator(invoiceNumber);
             if (!string.IsNullOrEmpty(validateResult))
             {
                 result.Message = validateResult;
@@ -737,7 +737,7 @@ namespace ERPXTpl
         public async Task<Result> AddSalesInvoice(SalesInvoice salesInvoice)
         {
             Result result = new Result();
-            var validateResult = SalesInvoiceValidator.PostSalesInvoiceValidator(salesInvoice);
+            var validateResult = InvoiceValidator.PostInvoiceValidator(salesInvoice);
             if (!string.IsNullOrEmpty(validateResult))
             {
                 result.Message = validateResult;
@@ -783,7 +783,7 @@ namespace ERPXTpl
         public async Task<Result> ModifySalesInvoice(SalesInvoice salesInvoice)
         {
             Result result = new Result();
-            var validateResult = SalesInvoiceValidator.PutSalesInvoiceValidator(salesInvoice);
+            var validateResult = InvoiceValidator.PutSalesInvoiceValidator(salesInvoice);
             if (!string.IsNullOrEmpty(validateResult))
             {
                 result.Message = validateResult;
@@ -821,10 +821,10 @@ namespace ERPXTpl
             return result;
         }
 
-        public async Task<Result> DeleteSalesinvoice(long productId)
+        public async Task<Result> DeleteSalesinvoice(long invoiceId)
         {
             Result result = new Result();
-            var validateResult = SalesInvoiceValidator.GetSalesInvoiceValidator(productId);
+            var validateResult = InvoiceValidator.GetInvoiceValidator(invoiceId);
             if (!string.IsNullOrEmpty(validateResult))
             {
                 result.Message = validateResult;
@@ -842,7 +842,7 @@ namespace ERPXTpl
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.SALES_INVOICES +"/"+ productId);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.SALES_INVOICES +"/"+ invoiceId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
                     response = await client.SendAsync(request);
