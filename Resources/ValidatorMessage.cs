@@ -12,7 +12,7 @@
         public static readonly string PAYMENT_METHOD_ID_VALIDATE = "Payment Method Id cannot be zero";
         public static readonly string INVOICE_ID_VALIDATE = "Invoice Id cannot be zero";
         public static readonly string PRINT_TEMPLATE_ID_VALIDATE = "Print Template Id cannot be zero";
-        public static readonly string PRODUCT_ID_VALIDATE = "Product Id cannot be zero";
+        public static readonly string PRODUCT_ID_VALIDATE = "Product Id cannot be zero or null";
         public static readonly string PRODUCT_OBJECT_VALIDATE = "Product object cannot be null";
         public static readonly string PRODUCT_NAME_VALIDATE = "Product Name cannot be null or empty";
         public static readonly string PRODUCT_UNIT_VALIDATE = "Product UnitOfMeasurment cannot be null or empty";
