@@ -215,7 +215,7 @@ namespace ERPXTpl
             return await GetCustomer(TIN, Endpoint.CUSTOMERS + "?nip=");
         }
 
-        private async Task<Result> GetCustomerByEmail(string email)
+        public async Task<Result> GetCustomerByEmail(string email)
         {
             var tokenResponse = await GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
@@ -449,7 +449,7 @@ namespace ERPXTpl
             return result;
         }
 
-        public async Task<Result> GetBankAccounts()
+        public async Task<Result> GetBankAccount()
         {
             var tokenResponse = await GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
