@@ -2,12 +2,12 @@
 {
     public enum RateEnum
     {
-        TwentyThreePercent = 9,
+        TWENTY_THREE_PERCENT = 9,
         NON_TAXABLE = 0,
         EXEMPT = 1,
-        ZeroPercent = 2,
-        FourPercent = 6,
-        FivePercent = 7,
-        EightPercent = 8,
+        ZERO_PERCENT = 2,
+        FOUR_PERCENT = 6,
+        FIVE_PERCENT = 7,
+        EIGHT_PERCENT = 8,
     }
 }

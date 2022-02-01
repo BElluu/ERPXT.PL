@@ -6,14 +6,15 @@
     <PackageProjectUrl></PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/BElluu/ERPXT.PL</RepositoryUrl>
-    <PackageTags>erp;api;sdk;erpxt</PackageTags>
-    <PackageLicenseFile>D:\Programowanie\erpxtpl-sdk\ERPXT.pl-SDK\LICENSE</PackageLicenseFile>
+    <PackageTags>erp;api;erpxt</PackageTags>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Authors>Bartłomiej Komendarczuk</Authors>
-    <Product>$(AssemblyName)-SDK</Product>
-    <PackageId>$(AssemblyName)-SDK</PackageId>
+    <Product>$(AssemblyName)</Product>
+    <PackageId>$(AssemblyName)</PackageId>
     <Description>A library that is to facilitate the use of the ERP XT API without unnecessary implementation.</Description>
-    <Copyright>https://choosealicense.com/licenses/apache-2.0/</Copyright>
+    <Copyright>https://choosealicense.com/licenses/mit/</Copyright>
+	<Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Text.Json" Version="6.0.1" />
+	<None Include="LICENSE" Pack="true" PackagePath=""/>
   </ItemGroup>
 
   <ItemGroup>
