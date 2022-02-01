@@ -41,7 +41,7 @@ namespace ERPXTpl.Validators
                 return ValidatorMessage.PRODUCT_OBJECT_VALIDATE;
             }
 
-            if (product.Id == 0)
+            if (product.Id == 0 || product.Id == null)
             {
                 return ValidatorMessage.PRODUCT_ID_VALIDATE;
             }

@@ -8,7 +8,7 @@ namespace ERPXTpl.Models
         long Id { get; set; }
         string OSSProcedureCountryCode { get; set; }
         bool IsOSSProcedure { get; set; }
-        long PurchasingPartyId { get; set; }
+        long? PurchasingPartyId { get; set; }
         long? ReceivingPartyId { get; set; }
         long? PaymentTypeId { get; set; }
         long? BankAccountId { get; set; }

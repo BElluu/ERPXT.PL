@@ -29,7 +29,7 @@ namespace ERPXTpl.Validators
             {
                 return ValidatorMessage.INVOICE_OBJECT_VALIDATE;
             }
-            if(invoice.PurchasingPartyId == 0)
+            if(invoice.PurchasingPartyId == 0 || invoice.PurchasingPartyId == null)
             {
                 return ValidatorMessage.INVOICE_PURCHASING_PARTY_ID_VALIDATE;
             }
@@ -41,7 +41,7 @@ namespace ERPXTpl.Validators
             {
                 foreach(var item in invoice.Items)
                 {
-                    if(item.ProductId == 0)
+                    if(item.ProductId == 0 || item.ProductId == null)
                     {
                         return ValidatorMessage.PRODUCT_ID_VALIDATE;
                     }
@@ -69,7 +69,7 @@ namespace ERPXTpl.Validators
             {
                 return ValidatorMessage.INVOICE_ID_VALIDATE;
             }
-            if (invoice.PurchasingPartyId == 0)
+            if (invoice.PurchasingPartyId == 0 || invoice.PurchasingPartyId == null)
             {
                 return ValidatorMessage.INVOICE_PURCHASING_PARTY_ID_VALIDATE;
             }
@@ -81,7 +81,7 @@ namespace ERPXTpl.Validators
             {
                 foreach (var item in invoice.Items)
                 {
-                    if (item.ProductId == 0)
+                    if (item.ProductId == 0 || item.ProductId == null)
                     {
                         return ValidatorMessage.PRODUCT_ID_VALIDATE;
                     }

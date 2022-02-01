@@ -14,5 +14,6 @@
         public static string PROFORMA_PRINT_CUSTOM = "https://app.erpxt.pl/api2/public/v1.2/proformas/{0}/print?customPrintId={1}"; // API 1.2
         public static string SALES_INVOICES = "https://app.erpxt.pl/api2/public/v1.2/invoices";
         public static string VAT_RATES = "https://app.erpxt.pl/api2/public/v1.2/vatrates/";
+        public static string PROFORMA_INVOICES = "https://app.erpxt.pl/api2/public/v1.2/proformas";
     }
 }

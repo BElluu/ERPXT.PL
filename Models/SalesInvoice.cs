@@ -14,7 +14,7 @@ namespace ERPXTpl.Models
         public PaymentStatusEnum PaymentStatus { get; set; }
         public string OSSProcedureCountryCode { get; set; }
         public bool IsOSSProcedure { get; set; }
-        public long PurchasingPartyId { get; set; }
+        public long? PurchasingPartyId { get; set; }
         public long? ReceivingPartyId { get; set; }
         public long? PaymentTypeId { get; set; }
         public long? BankAccountId { get; set; }
@@ -35,7 +35,7 @@ namespace ERPXTpl.Models
     public class Item
     {
         public long Id { get; set; }
-        public long ProductId { get; set; }
+        public long? ProductId { get; set; }
         public decimal Quantity { get; set; }
         public decimal ProductCurrencyPrice { get; set; }
         public string ProductDescription { get; set; }

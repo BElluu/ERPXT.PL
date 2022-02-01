@@ -14,7 +14,7 @@ namespace ERPXTpl.Models
         public long Id { get; set; }
         public string OSSProcedureCountryCode { get; set; }
         public bool IsOSSProcedure { get; set; }
-        public long PurchasingPartyId { get; set; }
+        public long? PurchasingPartyId { get; set; }
         public long? ReceivingPartyId { get; set; }
         public long? PaymentTypeId { get; set; }
         public long? BankAccountId { get; set; }
