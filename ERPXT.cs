@@ -224,7 +224,7 @@ namespace ERPXTpl
             }
 
             Result result = new Result();
-            Customer customerData = null;
+            List<Customer> customerData = null;
             using (var client = new HttpClient())
             {
                 try
@@ -236,7 +236,7 @@ namespace ERPXTpl
 
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
-                        customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
+                        customerData = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
                     }
                     return ResponseResult(response, responseBody, customerData);
                 }
