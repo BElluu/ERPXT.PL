@@ -2,10 +2,22 @@
 
 A library that is to facilitate the use of the [ERP XT](https://www.erpxt.pl) API without unnecessary implementation.
 
+[Nuget](https://www.nuget.org/packages/ERPXTpl/)
+
 ## Requirements
 
 You need to have ClientId and SecretKey to authorize API server. More information about how to get this data you can found on this page [ERPXT-Authorization](https://pomoc.erpxt.pl/dokumentacja/api-autoryzacja/)
 
+## Installation
+### Package Manager
+```
+Install-Package ERPXTpl
+```
+### .NET CLI
+```
+dotnet add package ERPXTpl
+```
+or just find library in Nuget Package Manager in Visual Studio ;)
 
 ## Usage
 You need to create a main object that takes two parameters - ClientId and SecretKey.
