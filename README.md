@@ -29,15 +29,19 @@ The token is saved in the memory cache. Prior to each request to the API, its va
 
 Each request is wrapped in a Result object. Result consists of Data, StatusCode, and Message
 ```
-Data = returned object from response
+Data = returned object from response.
 StatusCode = HttpCode from response or "ERROR" if something went wrong before send request.
-Message = Message from server if something went wrong
+Message = Message from server if something went wrong or message from internal validator.
 ```
 
 # Examples
 
 Methods are really simple and readable. I will write some examples below but if you need more information, you can ask me by creating issue :)
 
+### Get list of products
+```csharp
+var getProducts = await erpxt.GetProduct()
+```
 ### Get product by ID
 ```csharp
 long productId = 12345678;
@@ -55,7 +59,7 @@ var addProduct = await erpxt.AddProduct(product);
 ### Get customer by ID
 ```csharp
 long customerId = 12349876;
-var getCustomer = await erpxt.GetCustomerById(customerId);
+var getCustomer = await erpxt.GetCustomer(customerId);
 ```
 
 ### Get customer by Email
@@ -92,7 +96,7 @@ var deleteCustomer = await erpxt.DeleteCustomer(customerId);
 ```
 ### Get list of payment methods
 ```csharp
-var getPaymentMethods = await erpxt.GetPaymentMethods();
+var getPaymentMethods = await erpxt.GetPaymentMethod();
 ```
 
 ### Get bank accounts
