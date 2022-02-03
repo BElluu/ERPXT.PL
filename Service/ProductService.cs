@@ -45,7 +45,7 @@ namespace ERPXTpl.Service
                         productData = JsonConvert.DeserializeObject<List<Product>>(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, productData);
+                    return ResponseService.TakeResult(response, responseBody, productData);
                 }
                 catch (Exception ex)
                 {
@@ -85,7 +85,7 @@ namespace ERPXTpl.Service
                         productData = JsonConvert.DeserializeObject<Product>(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, productData);
+                    return ResponseService.TakeResult(response, responseBody, productData);
                 }
                 catch (Exception ex)
                 {
@@ -130,7 +130,7 @@ namespace ERPXTpl.Service
                         productData.Id = Int64.Parse(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, productData);
+                    return ResponseService.TakeResult(response, responseBody, productData);
                 }
                 catch (Exception ex)
                 {
@@ -171,7 +171,7 @@ namespace ERPXTpl.Service
                     response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseService.ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -208,7 +208,7 @@ namespace ERPXTpl.Service
                     response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseService.ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {

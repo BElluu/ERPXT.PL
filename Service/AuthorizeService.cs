@@ -37,7 +37,6 @@ namespace ERPXTpl.Service
                         var response = await client.SendAsync(request);
                         string responseBody = await response.Content.ReadAsStringAsync();
 
-
                         if (response.IsSuccessStatusCode)
                         {
                             var authObject = JsonConvert.DeserializeObject<Authorization>(responseBody);

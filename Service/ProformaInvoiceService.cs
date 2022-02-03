@@ -1,4 +1,4 @@
-﻿/*using ERPXTpl.Model;
+﻿using ERPXTpl.Model;
 using ERPXTpl.Validator;
 using Newtonsoft.Json;
 using System;
@@ -8,16 +8,23 @@ using System.Net.Http;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ERPXTpl.Service
 {
     internal class ProformaInvoiceService
     {
+        private readonly AuthorizeService authorizeService;
+
+        public ProformaInvoiceService()
+        {
+            authorizeService = new AuthorizeService();
+        }
         public async Task<Result> GetProformaInvoice()
         {
             Result result = new Result();
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -30,14 +37,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PROFORMA_INVOICES);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoice = JsonConvert.DeserializeObject<List<ProformaInvoice>>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoice);
+                    return ResponseService.TakeResult(response, responseBody, invoice);
 
                 }
                 catch (Exception ex)
@@ -59,7 +66,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -72,14 +79,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PROFORMA_INVOICES + "/" + invoiceId);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoice = JsonConvert.DeserializeObject<ProformaInvoice>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoice);
+                    return ResponseService.TakeResult(response, responseBody, invoice);
 
                 }
                 catch (Exception ex)
@@ -113,7 +120,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -126,7 +133,7 @@ namespace ERPXTpl.Service
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Endpoint.PROFORMA_INVOICES);
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     string proformaInvoiceDataToAdd = JsonConvert.SerializeObject(proformaInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -139,7 +146,7 @@ namespace ERPXTpl.Service
                         proformaInvoiceData.Id = Int64.Parse(responseBody);
                     }
 
-                    return ResponseResult(response, responseBody, proformaInvoiceData);
+                    return ResponseService.TakeResult(response, responseBody, proformaInvoiceData);
                 }
                 catch (Exception ex)
                 {
@@ -159,7 +166,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -171,7 +178,7 @@ namespace ERPXTpl.Service
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.PROFORMA_INVOICES);
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     string proformaInvoiceDataToAdd = JsonConvert.SerializeObject(proformaInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -180,7 +187,7 @@ namespace ERPXTpl.Service
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -190,7 +197,7 @@ namespace ERPXTpl.Service
             return result;
         }
 
-        private async Task<Result> DeleteProformaInvoice(long invoiceId)
+        public async Task<Result> DeleteProformaInvoice(long invoiceId)
         {
             Result result = new Result();
             var validateResult = InvoiceValidator.GetInvoiceValidator(invoiceId);
@@ -200,7 +207,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -213,11 +220,11 @@ namespace ERPXTpl.Service
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.PROFORMA_INVOICES);
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -231,7 +238,7 @@ namespace ERPXTpl.Service
         {
             Result result = new Result();
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -244,14 +251,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PROFORMA_INVOICES + filter);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoices = JsonConvert.DeserializeObject<List<ProformaInvoice>>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoices);
+                    return ResponseService.TakeResult(response, responseBody, invoices);
 
                 }
                 catch (Exception ex)
@@ -263,4 +270,3 @@ namespace ERPXTpl.Service
         }
     }
 }
-*/

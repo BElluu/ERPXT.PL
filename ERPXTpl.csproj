@@ -14,7 +14,7 @@
     <PackageId>$(AssemblyName)</PackageId>
     <Description>A library that is to facilitate the use of the ERP XT API without unnecessary implementation.</Description>
     <Copyright>https://choosealicense.com/licenses/mit/</Copyright>
-	<Version>1.0.1</Version>
+	<Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

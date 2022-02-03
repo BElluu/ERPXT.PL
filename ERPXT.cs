@@ -18,125 +18,193 @@ namespace ERPXTpl
             SecretKey = secretKey;
             cache.Set(CacheData.Expires, new DateTime());
         }
-
-        public Task<Result> GetBankAccount()
+        public async Task<Result> GetBankAccount()
         {
             BankAccountService bankAccountService = new BankAccountService();
-            return bankAccountService.GetBankAccount();
+            return await bankAccountService.GetBankAccount();
         }
-
-        public Task<Result> GetBankAccount(long bankAccountId)
+        public async Task<Result> GetBankAccount(long bankAccountId)
         {
             BankAccountService bankAccountService = new BankAccountService();
-            return bankAccountService.GetBankAccount(bankAccountId);
+            return await bankAccountService.GetBankAccount(bankAccountId);
+        }
+        public async Task<Result> GetCustomer()
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.GetCustomers();
+        }
+        public async Task<Result> GetCustomer(long customerId)
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.GetCustomerById(customerId);
+        }
+        public async Task<Result> GetCustomer(string TIN)
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.GetCustomerByTIN(TIN);
+        }
+        public async Task<Result> GetCustomerByEmail(string email)
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.GetCustomersByEmail(email);
+        }
+        public async Task<Result> AddCustomer(Customer customer)
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.AddCustomer(customer);
+        }
+        public async Task<Result> ModifyCustomer(Customer customer)
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.ModifyCustomer(customer);
+        }
+        public async Task<Result> DeleteCustomer(long customerId)
+        {
+            CustomerService customerService = new CustomerService();
+            return await customerService.DeleteCustomer(customerId);
         }
 
-        public Task<Result> GetCustomer(long customerId)
-        {
-            CustomerService customerService = new CustomerService();
-            return customerService.GetCustomerById(customerId);
-        }
-        public Task<Result> GetCustomer(string TIN)
-        {
-            CustomerService customerService = new CustomerService();
-            return customerService.GetCustomerByTIN(TIN);
-        }
-        public Task<Result> GetCustomerByEmail(string email)
-        {
-            CustomerService customerService = new CustomerService();
-            return customerService.GetCustomersByEmail(email);
-        }
-        public Task<Result> AddCustomer(Customer customer)
-        {
-            CustomerService customerService = new CustomerService();
-            return customerService.AddCustomer(customer);
-        }
-        public Task<Result> ModifyCustomer(Customer customer)
-        {
-            CustomerService customerService = new CustomerService();
-            return customerService.ModifyCustomer(customer);
-        }
-        public Task<Result> DeleteCustomer(long customerId)
-        {
-            CustomerService customerService = new CustomerService();
-            return customerService.DeleteCustomer(customerId);
-        }
-
-        public Task<Result> GetVatRates()
+        public async Task<Result> GetVatRates()
         {
             DictionaryDataService dictionaryDataService = new DictionaryDataService();
-            return dictionaryDataService.GetVatRates();
+            return await dictionaryDataService.GetVatRates();
         }
-        public Task<Result> GetCountries()
+        public async Task<Result> GetCountries()
         {
             DictionaryDataService dictionaryDataService = new DictionaryDataService();
-            return dictionaryDataService.GetCountries();
+            return await dictionaryDataService.GetCountries();
         }
 
-        public Task<Result> GetPaymentMethod()
+        public async Task<Result> GetPaymentMethod()
         {
             PaymentMethodService paymentMethodService = new PaymentMethodService();
-            return paymentMethodService.GetPaymentMethod();
+            return await paymentMethodService.GetPaymentMethod();
         }
-        public Task<Result> GetPaymentMethod(long paymentMethodId)
+        public async Task<Result> GetPaymentMethod(long paymentMethodId)
         {
             PaymentMethodService paymentMethodService = new PaymentMethodService();
-            return paymentMethodService.GetPaymentMethod(paymentMethodId);
+            return await paymentMethodService.GetPaymentMethod(paymentMethodId);
         }
-        public Task<Result> GetPrintTemplates()
+        public async Task<Result> GetPrintTemplates()
         {
             PrintService printService = new PrintService();
-            return printService.GetPrintTemplates();
+            return await printService.GetPrintTemplates();
         }
-        public Task<Result> GetInvoicePrintByCustomer(long invoiceId)
+        public async Task<Result> GetInvoicePrintByCustomer(long invoiceId)
         {
             PrintService printService = new PrintService();
-            return printService.GetInvoicePrintByCustomer(invoiceId);
+            return await printService.GetInvoicePrintByCustomer(invoiceId);
         }
-        public Task<Result> GetProformaPrintByCustomer(long invoiceId)
+        public async Task<Result> GetProformaPrintByCustomer(long invoiceId)
         {
             PrintService printService = new PrintService();
-            return printService.GetProformaPrintByCustomer(invoiceId);
+            return await printService.GetProformaPrintByCustomer(invoiceId);
         }
-        public Task<Result> GetInvoiceCustomPrint(long invoiceId, long printTemplateId)
+        public async Task<Result> GetInvoiceCustomPrint(long invoiceId, long printTemplateId)
         {
             PrintService printService = new PrintService();
-            return printService.GetInvoiceCustomPrint(invoiceId, printTemplateId);
+            return await printService.GetInvoiceCustomPrint(invoiceId, printTemplateId);
         }
-        public Task<Result> GetProformaCustomPrint(long invoiceId, long printTemplateId)
+        public async Task<Result> GetProformaCustomPrint(long invoiceId, long printTemplateId)
         {
             PrintService printService = new PrintService();
-            return printService.GetProformaCustomPrint(invoiceId, printTemplateId);
+            return await printService.GetProformaCustomPrint(invoiceId, printTemplateId);
         }
-        public Task<Result> SavePrintToFile(string base64Print, string pathToSave)
+        public async Task<Result> SavePrintToFile(string base64Print, string pathToSave)
         {
             PrintService printService = new PrintService();
-            return printService.SavePrintToFile(base64Print, pathToSave);
+            return await printService.SavePrintToFile(base64Print, pathToSave);
         }
-        public Task<Result> GetProduct()
+        public async Task<Result> GetProduct()
         {
             ProductService productService = new ProductService();
-            return productService.GetProduct();
+            return await productService.GetProduct();
         }
-        public Task<Result> GetProduct(long productId)
+        public async Task<Result> GetProduct(long productId)
         {
             ProductService productService = new ProductService();
-            return productService.GetProduct(productId);
+            return await productService.GetProduct(productId);
         }
-        public Task<Result> AddProduct(Product product)
+        public async Task<Result> AddProduct(Product product)
         {
             ProductService productService = new ProductService();
-            return productService.AddProduct(product);
+            return await productService.AddProduct(product);
         }
-        public Task<Result> ModifyProduct(Product product)
+        public async Task<Result> ModifyProduct(Product product)
         {
             ProductService productService = new ProductService();
-            return productService.ModifyProduct(product);
+            return await productService.ModifyProduct(product);
         }
-        public Task<Result> DeleteProduct(long productId)
+        public async Task<Result> DeleteProduct(long productId)
         {
             ProductService productService = new ProductService();
-            return productService.DeleteProduct(productId);
+            return await productService.DeleteProduct(productId);
+        }
+        public async Task<Result> GetProformaInvoice()
+        {
+            ProformaInvoiceService proformaInvoiceService = new ProformaInvoiceService();
+            return await proformaInvoiceService.GetProformaInvoice();
+        }
+        public async Task<Result> GetProformaInvoice(long invoiceId)
+        {
+            ProformaInvoiceService proformaInvoiceService = new ProformaInvoiceService();
+            return await proformaInvoiceService.GetProformaInvoice(invoiceId);
+        }
+
+        public async Task<Result> GetProformaInvoice(bool converted)
+        {
+            ProformaInvoiceService proformaInvoiceService = new ProformaInvoiceService();
+            return await proformaInvoiceService.GetProformasFiltered(converted);
+        }
+        public async Task<Result> AddProformaInvoice(ProformaInvoice proformaInvoice)
+        {
+            ProformaInvoiceService proformaInvoiceService = new ProformaInvoiceService();
+            return await proformaInvoiceService.AddProformaInvoice(proformaInvoice);
+        }
+        public async Task<Result> ModifyProformaInvoice(ProformaInvoice proformaInvoice)
+        {
+            ProformaInvoiceService proformaInvoiceService = new ProformaInvoiceService();
+            return await proformaInvoiceService.ModifyProformaInvoice(proformaInvoice);
+        }
+        public async Task<Result> DeleteProformaInvoice(long invoiceId)
+        {
+            ProformaInvoiceService proformaInvoiceService = new ProformaInvoiceService();
+            return await proformaInvoiceService.DeleteProformaInvoice(invoiceId);
+        }
+        public async Task<Result> GetSalesInvoice()
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.GetSalesInvoice();
+        }
+        public async Task<Result> GetSalesInvoice(long invoiceId)
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.GetSalesInvoice(invoiceId);
+        }
+        public async Task<Result> GetSalesInvoice(string invoiceNumber)
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.GetSalesInvoice(invoiceNumber);
+        }
+        public async Task<Result> GetLastInvoices(int numberOfInvoices)
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.GetLastInvoices(numberOfInvoices);
+        }
+        public async Task<Result> AddSalesInvoice(SalesInvoice salesInvoice)
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.AddSalesInvoice(salesInvoice);
+        }
+        public async Task<Result> ModifySalesInvoice(SalesInvoice salesInvoice)
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.ModifySalesInvoice(salesInvoice);
+        }
+        public async Task<Result> DeleteSalesInvoice(long invoiceId)
+        {
+            SalesInvoiceService salesInvoiceService = new SalesInvoiceService();
+            return await salesInvoiceService.DeleteSalesInvoice(invoiceId);
         }
     }
 }

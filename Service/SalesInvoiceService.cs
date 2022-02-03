@@ -1,4 +1,4 @@
-﻿/*using ERPXTpl.Model;
+﻿using ERPXTpl.Model;
 using ERPXTpl.Validator;
 using Newtonsoft.Json;
 using System;
@@ -8,16 +8,23 @@ using System.Net.Http;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace ERPXTpl.Service
 {
     internal class SalesInvoiceService
     {
+        private readonly AuthorizeService authorizeService;
+
+        public SalesInvoiceService()
+        {
+            authorizeService = new AuthorizeService();
+        }
         public async Task<Result> GetSalesInvoice()
         {
             Result result = new Result();
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -30,14 +37,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoices = JsonConvert.DeserializeObject<List<SalesInvoice>>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoices);
+                    return ResponseService.TakeResult(response, responseBody, invoices);
 
                 }
                 catch (Exception ex)
@@ -59,7 +66,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -72,14 +79,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES + "/" + invoiceId);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoice = JsonConvert.DeserializeObject<SalesInvoice>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoice);
+                    return ResponseService.TakeResult(response, responseBody, invoice);
 
                 }
                 catch (Exception ex)
@@ -101,7 +108,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -114,14 +121,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.SALES_INVOICES + "?number=" + invoiceNumber);
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoice = JsonConvert.DeserializeObject<SalesInvoice>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoice);
+                    return ResponseService.TakeResult(response, responseBody, invoice);
 
                 }
                 catch (Exception ex)
@@ -136,7 +143,7 @@ namespace ERPXTpl.Service
         {
             Result result = new Result();
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -149,14 +156,14 @@ namespace ERPXTpl.Service
                 try
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, string.Format(Endpoint.SALES_INVOICES + "?&$orderby=IssueDate desc, Id desc &$skip=0 &$top={0}", numberOfInvoices));
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
                         invoices = JsonConvert.DeserializeObject<List<SalesInvoice>>(responseBody);
                     }
-                    return ResponseResult(response, responseBody, invoices);
+                    return ResponseService.TakeResult(response, responseBody, invoices);
 
                 }
                 catch (Exception ex)
@@ -177,7 +184,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -190,7 +197,7 @@ namespace ERPXTpl.Service
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, Endpoint.SALES_INVOICES);
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     string salesInvoiceDataToAdd = JsonConvert.SerializeObject(salesInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -203,7 +210,7 @@ namespace ERPXTpl.Service
                         salesInvoiceData.Id = Int64.Parse(responseBody);
                     }
 
-                    return ResponseResult(response, responseBody, salesInvoiceData);
+                    return ResponseService.TakeResult(response, responseBody, salesInvoiceData);
                 }
                 catch (Exception ex)
                 {
@@ -223,7 +230,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -235,7 +242,7 @@ namespace ERPXTpl.Service
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.SALES_INVOICES);
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                     string salesInvoiceDataToAdd = JsonConvert.SerializeObject(salesInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
@@ -244,7 +251,7 @@ namespace ERPXTpl.Service
                     var response = await client.PostAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -254,7 +261,7 @@ namespace ERPXTpl.Service
             return result;
         }
 
-        private async Task<Result> DeleteSalesInvoice(long invoiceId)
+        public async Task<Result> DeleteSalesInvoice(long invoiceId)
         {
             Result result = new Result();
             var validateResult = InvoiceValidator.GetInvoiceValidator(invoiceId);
@@ -264,7 +271,7 @@ namespace ERPXTpl.Service
                 return result;
             }
 
-            var tokenResponse = await GetTokenIfNeeded();
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
             {
                 return tokenResponse;
@@ -277,11 +284,11 @@ namespace ERPXTpl.Service
                 {
                     HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.SALES_INVOICES);
 
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", cache.Get(CacheData.AccessToken).ToString());
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -292,4 +299,3 @@ namespace ERPXTpl.Service
         }
     }
 }
-*/

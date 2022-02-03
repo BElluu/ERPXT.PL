@@ -7,7 +7,7 @@ namespace ERPXTpl.Validator
     {
         internal static string GetInvoiceValidator(long invoiceId)
         {
-            if(invoiceId == 0)
+            if (invoiceId == 0)
             {
                 return ValidatorMessage.INVOICE_ID_VALIDATE;
             }
@@ -25,11 +25,11 @@ namespace ERPXTpl.Validator
 
         internal static string PostInvoiceValidator(IInvoice invoice)
         {
-            if(invoice == null)
+            if (invoice == null)
             {
                 return ValidatorMessage.INVOICE_OBJECT_VALIDATE;
             }
-            if(invoice.PurchasingPartyId == 0 || invoice.PurchasingPartyId == null)
+            if (invoice.PurchasingPartyId == 0 || invoice.PurchasingPartyId == null)
             {
                 return ValidatorMessage.INVOICE_PURCHASING_PARTY_ID_VALIDATE;
             }
@@ -37,19 +37,19 @@ namespace ERPXTpl.Validator
             {
                 return ValidatorMessage.INVOICE_PAYMENT_TYPE_ID_VALIDATE;
             }
-            if(invoice.Items.Count > 0)
+            if (invoice.Items.Count > 0)
             {
-                foreach(var item in invoice.Items)
+                foreach (var item in invoice.Items)
                 {
-                    if(item.ProductId == 0 || item.ProductId == null)
+                    if (item.ProductId == 0 || item.ProductId == null)
                     {
                         return ValidatorMessage.PRODUCT_ID_VALIDATE;
                     }
-                    if(item.Quantity == 0)
+                    if (item.Quantity == 0)
                     {
                         return ValidatorMessage.PRODUCT_QUANTITY_VALIDATE;
                     }
-                    if(item.ProductCurrencyPrice == 0)
+                    if (item.ProductCurrencyPrice == 0)
                     {
                         return ValidatorMessage.PRODUCT_CURRENCY_PRICE_VALIDATE;
                     }

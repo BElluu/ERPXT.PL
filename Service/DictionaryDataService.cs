@@ -41,7 +41,7 @@ namespace ERPXTpl.Service
                     {
                         vatRates = JsonConvert.DeserializeObject<List<VatRate>>(responseBody);
                     }
-                    return ResponseService.ResponseResult(response, responseBody, vatRates);
+                    return ResponseService.TakeResult(response, responseBody, vatRates);
 
                 }
                 catch (Exception ex)
@@ -76,7 +76,7 @@ namespace ERPXTpl.Service
                     {
                         countries = JsonConvert.DeserializeObject<List<string>>(responseBody);
                     }
-                    return ResponseService.ResponseResult(response, responseBody, countries);
+                    return ResponseService.TakeResult(response, responseBody, countries);
 
                 }
                 catch (Exception ex)

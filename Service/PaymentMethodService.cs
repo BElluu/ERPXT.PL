@@ -19,27 +19,52 @@ namespace ERPXTpl.Service
         {
             authorizeService = new AuthorizeService();
         }
+
         public async Task<Result> GetPaymentMethod()
         {
-            string url = Endpoint.PAYMENT_METHODS;
-            return await GetPaymentMethodHelper(url);
+            Result result = new Result();
+
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            List<PaymentMethod> paymentMethodData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PAYMENT_METHODS);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        paymentMethodData = JsonConvert.DeserializeObject<List<PaymentMethod>>(responseBody);
+                    }
+
+                    return ResponseService.TakeResult(response, responseBody, paymentMethodData);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
         }
         public async Task<Result> GetPaymentMethod(long paymentMethodId)
         {
+            Result result = new Result();
+
             var validateResult = PaymentMethodValidator.GetPaymentMethodById(paymentMethodId);
             if (!string.IsNullOrEmpty(validateResult))
             {
-                Result result = new Result();
                 result.Message = validateResult;
                 return result;
             }
-            string url = Endpoint.PAYMENT_METHODS + paymentMethodId;
-            return await GetPaymentMethodHelper(url);
-        }
-
-        private async Task<Result> GetPaymentMethodHelper(string url)
-        {
-            Result result = new Result();
 
             var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
@@ -52,7 +77,7 @@ namespace ERPXTpl.Service
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PAYMENT_METHODS + paymentMethodId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
@@ -63,7 +88,7 @@ namespace ERPXTpl.Service
                         paymentMethodData = JsonConvert.DeserializeObject<PaymentMethod>(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, paymentMethodData);
+                    return ResponseService.TakeResult(response, responseBody, paymentMethodData);
                 }
                 catch (Exception ex)
                 {

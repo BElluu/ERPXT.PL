@@ -20,27 +20,49 @@ namespace ERPXTpl.Service
         }
         public async Task<Result> GetBankAccount()
         {
-            string url = Endpoint.BANK_ACCOUNTS;
-            return await GetBankAccountHelper(url);
-        }
+            Result result = new Result();
 
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            List<BankAccount> bankAccountData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.BANK_ACCOUNTS);
+
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        bankAccountData = JsonConvert.DeserializeObject<List<BankAccount>>(responseBody);
+                    }
+
+                    return ResponseService.TakeResult(response, responseBody, bankAccountData);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
         public async Task<Result> GetBankAccount(long bankAccountId)
         {
+            Result result = new Result();
+
             var validateResult = BankAccountValidator.GetBankAccountById(bankAccountId);
             if (!string.IsNullOrEmpty(validateResult))
             {
-                Result result = new Result();
                 result.Message = validateResult;
                 return result;
             }
-
-            string url = Endpoint.BANK_ACCOUNTS + bankAccountId;
-            return await GetBankAccountHelper(url);
-        }
-
-        public async Task<Result> GetBankAccountHelper(string url)
-        {
-            Result result = new Result();
 
             var tokenResponse = await authorizeService.GetTokenIfNeeded();
             if (!tokenResponse.StatusCode.Contains("OK"))
@@ -53,7 +75,7 @@ namespace ERPXTpl.Service
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, url);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.BANK_ACCOUNTS + bankAccountId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
@@ -64,7 +86,7 @@ namespace ERPXTpl.Service
                         bankAccountData = JsonConvert.DeserializeObject<BankAccount>(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, bankAccountData);
+                    return ResponseService.TakeResult(response, responseBody, bankAccountData);
                 }
                 catch (Exception ex)
                 {

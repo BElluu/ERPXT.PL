@@ -19,6 +19,40 @@ namespace ERPXTpl.Service
         {
             authorizeService = new AuthorizeService();
         }
+
+        public async Task<Result> GetCustomers()
+        {
+            var tokenResponse = await authorizeService.GetTokenIfNeeded();
+            if (!tokenResponse.StatusCode.Contains("OK"))
+            {
+                return tokenResponse;
+            }
+
+            Result result = new Result();
+            List<Customer> customerData = null;
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.CUSTOMERS);
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
+                    var response = await client.SendAsync(request);
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
+                    {
+                        customerData = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
+                    }
+                    return ResponseService.TakeResult(response, responseBody, customerData);
+                }
+                catch (Exception ex)
+                {
+                    result.Message = ex.Message;
+                }
+            }
+            return result;
+        }
+
         public async Task<Result> GetCustomerById(long customerId)
         {
             var validateResult = CustomerValidator.DeleteAndGetCustomerByIdValidator(customerId);
@@ -66,7 +100,7 @@ namespace ERPXTpl.Service
                     {
                         customerData = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
                     }
-                    return ResponseService.ResponseResult(response, responseBody, customerData);
+                    return ResponseService.TakeResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {
@@ -112,7 +146,7 @@ namespace ERPXTpl.Service
                         customerData.Id = Int64.Parse(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, customerData);
+                    return ResponseService.TakeResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {
@@ -154,7 +188,7 @@ namespace ERPXTpl.Service
                     response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseService.ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -190,7 +224,7 @@ namespace ERPXTpl.Service
                     response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
-                    return ResponseService.ResponseResult(response, responseBody);
+                    return ResponseService.TakeResult(response, responseBody);
                 }
                 catch (Exception ex)
                 {
@@ -223,7 +257,7 @@ namespace ERPXTpl.Service
                     {
                         customerData = JsonConvert.DeserializeObject<Customer>(responseBody);
                     }
-                    return ResponseService.ResponseResult(response, responseBody, customerData);
+                    return ResponseService.TakeResult(response, responseBody, customerData);
                 }
                 catch (Exception ex)
                 {

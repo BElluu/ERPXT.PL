@@ -44,7 +44,7 @@ namespace ERPXTpl.Service
                         printsData = JsonConvert.DeserializeObject<List<PrintTemplate>>(responseBody);
                     }
 
-                    return ResponseService.ResponseResult(response, responseBody, printsData);
+                    return ResponseService.TakeResult(response, responseBody, printsData);
                 }
                 catch (Exception ex)
                 {
@@ -155,7 +155,7 @@ namespace ERPXTpl.Service
                     {
                         printData = JsonConvert.DeserializeObject<string>(responseBody).Substring(28);
                     }
-                    return ResponseService.ResponseResult(response, responseBody, printData);
+                    return ResponseService.TakeResult(response, responseBody, printData);
                 }
                 catch (Exception ex)
                 {

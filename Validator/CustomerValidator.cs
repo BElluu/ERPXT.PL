@@ -25,7 +25,7 @@ namespace ERPXTpl.Validator
 
         internal static string PostCustomerValidator(Customer customer)
         {
-            if(customer == null)
+            if (customer == null)
             {
                 return ValidatorMessage.CUSTOMER_OBJECT_VALIDATE;
             }
@@ -35,7 +35,7 @@ namespace ERPXTpl.Validator
                 return ValidatorMessage.CUSTOMER_NAME_VALIDATE;
             }
 
-            if (customer.CustomerStatus == Enum.CustomerStatus.INTRA_EU || 
+            if (customer.CustomerStatus == Enum.CustomerStatus.INTRA_EU ||
                 customer.CustomerStatus == Enum.CustomerStatus.TRILATERAL_INTRA_EU ||
                 customer.CustomerStatus == Enum.CustomerStatus.OSS_PROCEDURE)
             {
@@ -69,7 +69,7 @@ namespace ERPXTpl.Validator
                 customer.CustomerStatus == Enum.CustomerStatus.OSS_PROCEDURE) &&
                 string.IsNullOrEmpty(customer.CountryCode))
             {
-                    return ValidatorMessage.CUSTOMER_COUNTRY_CODE_VALIDATE;
+                return ValidatorMessage.CUSTOMER_COUNTRY_CODE_VALIDATE;
             }
             return string.Empty;
         }
