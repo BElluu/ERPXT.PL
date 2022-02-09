@@ -23,5 +23,14 @@
         public static readonly string INVOICE_PAYMENT_TYPE_ID_VALIDATE = "Invoice PaymentTypeId cannot be null";
         public static readonly string PRODUCT_QUANTITY_VALIDATE = "Product Quantity cannot be null";
         public static readonly string PRODUCT_CURRENCY_PRICE_VALIDATE = "ProductCurrencyPrice cannot be null";
+        public static readonly string BANK_ACCOUNT_OBJECT_VALIDATE = "Bank Account object cannot be null";
+        public static readonly string BANK_ACCOUNT_NUMBER_VALIDATE = "Bank Account Number cannot be null or empty";
+        public static readonly string BANK_ACCOUNT_SYMBOL_VALIDATE = "Bank Account Symbol cannot be null or empty";
+        public static readonly string BANK_ACCOUNT_REPORTING_PERIOD_VALIDATE = "Bank Account Reporting Period cannot be null";
+        public static readonly string PAYMENT_METHOD_OBJECT_VALIDATE = "Payment Method object cannot be null";
+        public static readonly string PAYMENT_METHOD_DEADLINE_VALIDATE = "Payment Method Deadline must be between 0 and 366";
+        public static readonly string PAYMENT_METHOD_TYPE_VALIDATE = "Payment Method Type cannot be null";
+        public static readonly string PAYMENT_METHOD_NAME_VALIDATE = "Payment Method Name cannot be null or empty";
+
     }
 }

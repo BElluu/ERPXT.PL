@@ -218,7 +218,7 @@ namespace ERPXTpl.Service
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.PROFORMA_INVOICES);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Delete, Endpoint.PROFORMA_INVOICES + invoiceId);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     response = await client.SendAsync(request);
