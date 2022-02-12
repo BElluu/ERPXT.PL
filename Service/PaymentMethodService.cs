@@ -165,7 +165,7 @@ namespace ERPXTpl.Service
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.PAYMENT_METHODS + paymentMethod);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Put, Endpoint.PAYMENT_METHODS);
 
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -173,7 +173,7 @@ namespace ERPXTpl.Service
                     string paymentMethodDataToAdd = JsonConvert.SerializeObject(paymentMethod, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     StringContent stringContent = new StringContent(paymentMethodDataToAdd, Encoding.UTF8, "application/json");
 
-                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    var response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
                     return ResponseService.TakeResult(response, responseBody);

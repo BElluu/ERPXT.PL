@@ -26,7 +26,7 @@ namespace ERPXTpl.Validator
                 return ValidatorMessage.PAYMENT_METHOD_NAME_VALIDATE;
             }
 
-            if (paymentMethod.Deadline > 0 && paymentMethod.Deadline <= 366)
+            if (paymentMethod.Deadline < 0 && paymentMethod.Deadline > 366)
             {
                 return ValidatorMessage.PAYMENT_METHOD_DEADLINE_VALIDATE;
             }
