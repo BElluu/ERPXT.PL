@@ -129,7 +129,7 @@ namespace ERPXTpl.Service
 
                     if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NoContent)
                     {
-                        bankAccount.Id = Int64.Parse(responseBody);
+                        bankAccountData.Id = Int64.Parse(responseBody);
                     }
 
                     return ResponseService.TakeResult(response, responseBody, bankAccountData);

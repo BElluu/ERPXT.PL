@@ -28,6 +28,21 @@ namespace ERPXTpl
             BankAccountService bankAccountService = new BankAccountService();
             return await bankAccountService.GetBankAccount(bankAccountId);
         }
+        public async Task<Result> AddBankAccount(BankAccount bankAccount)
+        {
+            BankAccountService bankAccountService = new BankAccountService();
+            return await bankAccountService.AddBankAccount(bankAccount);
+        }
+        public async Task<Result> ModifyBankAccount(BankAccount bankAccount)
+        {
+            BankAccountService bankAccountService = new BankAccountService();
+            return await bankAccountService.ModifyBankAccount(bankAccount);
+        }
+        public async Task<Result> DeleteBankAccount(long bankAccountId)
+        {
+            BankAccountService bankAccountService = new BankAccountService();
+            return await bankAccountService.DeleteBankAccount(bankAccountId);
+        }
         public async Task<Result> GetCustomer()
         {
             CustomerService customerService = new CustomerService();
@@ -84,6 +99,21 @@ namespace ERPXTpl
         {
             PaymentMethodService paymentMethodService = new PaymentMethodService();
             return await paymentMethodService.GetPaymentMethod(paymentMethodId);
+        }
+        public async Task<Result> AddPaymentMethod(PaymentMethod paymentMethod)
+        {
+            PaymentMethodService paymentMethodService = new PaymentMethodService();
+            return await paymentMethodService.AddPaymentMethod(paymentMethod);
+        }
+        public async Task<Result> ModifyPaymentMethod(PaymentMethod paymentMethod)
+        {
+            PaymentMethodService paymentMethodService = new PaymentMethodService();
+            return await paymentMethodService.ModifyPaymentMethod(paymentMethod);
+        }
+        public async Task<Result> DeletePaymentMethod(long paymentMethodId)
+        {
+            PaymentMethodService paymentMethodService = new PaymentMethodService();
+            return await paymentMethodService.DeletePaymentMethod(paymentMethodId);
         }
         public async Task<Result> GetPrintTemplates()
         {
