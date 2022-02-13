@@ -353,6 +353,7 @@ var defaultProformaPrintForCustomer = await erp.GetProformaPrintByCustomer(15339
 var customProformaPrint = await erp.GetProformaCustomPrint(15339936, 10177498);
 ```
 ### Save print to PDF
+```csharp
 string base64Print = customProformaPrint.Data.ToString();
 string path = "Z:\\OurCompany\\PrintsForCustomers\\";
 var getPrintPdf = await erp.SavePrintToFile(base64Print, path);
