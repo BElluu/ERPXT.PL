@@ -120,7 +120,7 @@ namespace ERPXTpl.Service
                 string fileName = "PDF" + DateTime.Now.ToString("dd-MM-yyyy-hh-mm") + ".pdf";
                 string file = pathToSave + fileName;
 
-                await Task.Run(() => File.WriteAllBytes(fileName, PDFDecoded));
+                await Task.Run(() => File.WriteAllBytes(file, PDFDecoded));
                 result.Message = fileName;
                 result.StatusCode = "OK";
             }

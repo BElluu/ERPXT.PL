@@ -78,7 +78,7 @@ namespace ERPXTpl.Service
             {
                 try
                 {
-                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PROFORMA_INVOICES + "/" + invoiceId);
+                    HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, Endpoint.PROFORMA_INVOICES + invoiceId);
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", ERPXT.cache.Get(CacheData.AccessToken).ToString());
                     var response = await client.SendAsync(request);
                     string responseBody = await response.Content.ReadAsStringAsync();
@@ -102,11 +102,11 @@ namespace ERPXTpl.Service
             string filter;
             if (converted == true)
             {
-                filter = "/?$filter=InvoiceDocIdNum ne null";
+                filter = "?$filter=InvoiceDocIdNum ne null";
             }
             else
             {
-                filter = "/?$filter=InvoiceDocIdNum eq null";
+                filter = "?$filter=InvoiceDocIdNum eq null";
             }
             return await GetFilteredProformas(filter);
         }
@@ -184,7 +184,7 @@ namespace ERPXTpl.Service
                     string proformaInvoiceDataToAdd = JsonConvert.SerializeObject(proformaInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     StringContent stringContent = new StringContent(proformaInvoiceDataToAdd, Encoding.UTF8, "application/json");
 
-                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    var response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
                     return ResponseService.TakeResult(response, responseBody);

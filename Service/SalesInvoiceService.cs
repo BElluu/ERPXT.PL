@@ -248,7 +248,7 @@ namespace ERPXTpl.Service
                     string salesInvoiceDataToAdd = JsonConvert.SerializeObject(salesInvoice, Formatting.Indented, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                     StringContent stringContent = new StringContent(salesInvoiceDataToAdd, Encoding.UTF8, "application/json");
 
-                    var response = await client.PostAsync(request.RequestUri, stringContent);
+                    var response = await client.PutAsync(request.RequestUri, stringContent);
                     string responseBody = await response.Content.ReadAsStringAsync();
 
                     return ResponseService.TakeResult(response, responseBody);
